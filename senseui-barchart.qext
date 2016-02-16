@@ -1,0 +1,9 @@
+{
+	"name" : "SenseUI-BarChart",
+	"description" : "A Mobile Friendly Bar Chart by the Demo Team",
+	"icon" : "text-image",
+	"type" : "visualization",
+	"version": "1.0",
+	"preview" : "text-image",
+	"author": "Yianni Ververis"
+}
