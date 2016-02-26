@@ -8,7 +8,7 @@
 // }
 
 .axis {
-  font: 10px sans-serif;
+  font: 0.9em sans-serif;
 }
 
 // .axis path,
@@ -25,6 +25,13 @@
 .senseui-barchart .content {
 	overflow-y: auto;
 	overflow-x: hidden;
+}
+#xaxis path {
+	fill: #cccccc;
+}
+#xaxis text,
+#yaxis text {
+	fill: #595959;
 }
 .senseui-barchart .footer {	
 	// background-color: gray;
@@ -43,11 +50,11 @@
 	fill: #77b62a;
 }
 .barTextIn{
-	font-size: 14px;
+	font-size: 0.9em;
 	fill: white;
 }
 .barTextOut {
-	font-size: 14px;
+	font-size: 0.9em;
 	fill: #404040;
 }
 

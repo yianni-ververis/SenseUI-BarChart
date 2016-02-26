@@ -28,6 +28,7 @@
   return function() {
     var direction = d3_tip_direction,
         offset    = d3_tip_offset,
+        offsetTop = d3_tip_offset_top,
         html      = d3_tip_html,
         node      = initNode(),
         svg       = null,
@@ -49,13 +50,16 @@
 
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
+          poffsetTop = offsetTop.apply(this, args),
           dir     = direction.apply(this, args),
           nodel   = getNodeEl(),
           i       = directions.length,
           coords,
-          scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
+          // scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
+          scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
-
+      
+      // var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
       nodel.html(content)
         .style({ opacity: 1, 'pointer-events': 'all' })
 
@@ -65,6 +69,10 @@
         top: (coords.top +  poffset[0]) + scrollTop + 'px',
         left: (coords.left + poffset[1]) + scrollLeft + 'px'
       })
+
+// console.log($(document).scrollTop());
+// console.log(poffsetTop);
+// console.log(scrollTop);
 
       return tip
     }
@@ -137,6 +145,14 @@
       return tip
     }
 
+    // Returns offset or
+    tip.offsetTop = function(v) {
+      if (!arguments.length) return offsetTop
+      offsetTop = v == null ? v : d3.functor(v)
+
+      return tip
+    }
+
     // Public: sets or gets the html value of the tooltip
     //
     // v - String value of the tip
@@ -162,6 +178,7 @@
 
     function d3_tip_direction() { return 'n' }
     function d3_tip_offset() { return [0, 0] }
+    function d3_tip_offset_top() { return  ' ' }
     function d3_tip_html() { return ' ' }
 
     var direction_callbacks = d3.map({
