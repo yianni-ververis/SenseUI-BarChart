@@ -33,6 +33,12 @@
 #yaxis text {
 	fill: #595959;
 }
+#xaxis text,
+#yaxis text,
+.barTextIn,
+.barTextOut {
+  font-size: 11px;
+}
 .senseui-barchart .footer {	
 	// background-color: gray;
 }
@@ -49,12 +55,10 @@
 	cursor: pointer;
 	fill: #77b62a;
 }
-.barTextIn{
-	font-size: 0.9em;
+.barTextIn {
 	fill: white;
 }
 .barTextOut {
-	font-size: 0.9em;
 	fill: #404040;
 }
 

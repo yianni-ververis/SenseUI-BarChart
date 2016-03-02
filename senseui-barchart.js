@@ -149,6 +149,7 @@ define([
 
 	me.paint = function($element,layout) {
 // console.log(layout);
+// console.log(this);
 		var vars = {
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -176,7 +177,8 @@ define([
 			dimensionTitle: layout.qHyperCube.qDimensionInfo[0].qFallbackTitle,
 			measureTitle: layout.qHyperCube.qMeasureInfo[0].qFallbackTitle,
 			verticalGridSpace: 60,
-			verticalGridLines: null
+			verticalGridLines: null,
+			this: this
 		};
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
 		vars.template = '\
@@ -221,7 +223,7 @@ define([
 		}
 
 		var dMax = d3.max(vars.data, function(d) { return d.measureNum; });
-		vars.canvasHeight = (vars.data.length * (vars.bar.height+(vars.bar.padding*2)));
+		vars.canvasHeight = (vars.data.length * (vars.bar.height+(vars.bar.padding*2)+3));
 // console.log(verticalGridLines);
 		// var grid = d3.range(vars.verticalGridLines).map(function(i){
 		// 	console.log(i);
@@ -318,7 +320,9 @@ define([
 				if (vars.label.width == 50) {
 					label = label.substring(0,6);
 				} else if (vars.label.width == 80) {
-					label = label.substring(0,11);
+					label = label.substring(0,13);
+				} else { // 150
+					label = label.substring(0,26);
 				}
 				return label; 
 			})
@@ -379,7 +383,7 @@ define([
 				return x(d.measureNum);
 			})
 			.on('mouseover', function(d, i){
-				d3.select(this).style("fill", vars.bar.colorHover); // 77b62a // 52cc52
+				d3.select(this).style("fill", vars.bar.colorHover);
 				tip.show(d); 
 			})
 			.on('mouseout', function(d, i){
@@ -388,7 +392,10 @@ define([
 			})
 			.on('click', function(d, i) {
 				tip.hide();
-				me.select(d);
+				// For one selection
+				// @todo remove for multiple selections
+				vars.this.backendApi.selectValues(0, [d.qElemNumber], false);
+				// vars.this.selectValues(0, [d.qElemNumber], false); // For multiple Selections
 			});
 
 		var transit = d3.select("svg").selectAll('#' + vars.id + " rect")
@@ -403,31 +410,37 @@ define([
 			.data(vars.data)
 			.enter()
 			.append('text')
+			.text(function(d){ return d.measure; })
 			.attr({'x':function(d) {
-				return (x(d.measureNum)>60) ? x(d.measureNum)-50 : x(d.measureNum)+5; 
+				var textWidth = this.getBBox().width;
+				return (x(d.measureNum)>(textWidth+10)) ? (x(d.measureNum)/2 - (textWidth/2)) : x(d.measureNum)+5; 
 			},'y':function(d,i){ 
 				return y(i)+34; 
 			}})
-			.text(function(d){ return d.measure; })
 			.attr("class", function(d) { 
-				return (x(d.measureNum)>60) ? 'barTextIn' : 'barTextOut';
+				var textWidth = this.getBBox().width;
+				return (x(d.measureNum)>(textWidth+10)) ? 'barTextIn' : 'barTextOut';
 			})
 			.on('click', function(d, i) {
-				me.select(d);
+				vars.this.selectValues(0, [d.qElemNumber], false);
 			});
 
-		// me.select = function (d, i) {
-		// 	this.backendApi.selectValues(0, [d.qElemNumber], false);
-		// }
 	};
 
 	// Controller for binding
 	me.controller =['$scope', '$rootScope', function($scope, $rootScope){
-		// console.log($scope);
+		// console.log($scope.$parent.layout.qHyperCube.qDimensionInfo[0].qFallbackTitle);
+		// console.log(me.app);
 		// console.log($rootScope);
-		me.select = function (d, i) {
-			$scope.backendApi.selectValues(0, [d.qElemNumber], false);
-		}
+// 		me.select = function (d, i) {
+// console.log($scope.$parent.layout.qHyperCube.qDimensionInfo[0].qFallbackTitle);
+// console.log(d.dimension);
+// console.log($scope.$parent.layout.qHyperCube.qDimensionInfo[0].qFallbackTitle);
+// 			// $scope.backendApi.selectValues(0, [d.qElemNumber], false);
+			// me.app.field($scope.$parent.layout.qHyperCube.qDimensionInfo[0].qFallbackTitle).selectValues([d.dimension], true, true).then(function(reply){
+			// 	console.log(reply);
+			// });
+		// }
 	}];
 
 	// me.template = template;
