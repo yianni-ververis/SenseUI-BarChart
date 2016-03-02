@@ -384,14 +384,14 @@ define([
 			})
 			.on('mouseover', function(d, i){
 				d3.select(this).style("fill", vars.bar.colorHover);
-				tip.show(d); 
+				// tip.show(d); 
 			})
 			.on('mouseout', function(d, i){
-				tip.hide(); 
+				// tip.hide(); 
 				d3.select(this).style("fill", vars.bar.color);
 			})
 			.on('click', function(d, i) {
-				tip.hide();
+				// tip.hide();
 				// For one selection
 				// @todo remove for multiple selections
 				vars.this.backendApi.selectValues(0, [d.qElemNumber], false);
