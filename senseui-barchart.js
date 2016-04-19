@@ -173,7 +173,7 @@ define([
 								xaxisVisible: {
 									type: "boolean",
 									component: "switch",
-									label: "On / Off",
+									label: "Show X Axis?",
 									ref: "vars.xaxis.visible",
 									options: [{
 										value: true,
@@ -183,6 +183,20 @@ define([
 										label: "Off"
 									}],
 									defaultValue: false
+								},
+								legendVisible: {
+									type: "boolean",
+									component: "switch",
+									label: "Show Legend?",
+									ref: "vars.legend.visible",
+									options: [{
+										value: true,
+										label: "On"
+									}, {
+										value: false,
+										label: "Off"
+									}],
+									defaultValue: true
 								}
 							},
 						},
@@ -193,7 +207,7 @@ define([
 								yaxisVisible: {
 									type: "boolean",
 									component: "switch",
-									label: "On / Off",
+									label: "Show Y Axis?",
 									ref: "vars.yaxis.visible",
 									options: [{
 										value: true,
@@ -270,7 +284,11 @@ define([
 				dimension: (layout.vars.tooltip && layout.vars.tooltip.dimension)?true:false,
 			},
 			canvasHeight: null,
-			legendHeight: 50,
+			// legendHeight: 50,
+			legend: {
+				height: 50,
+				visible: (layout.vars.legend && layout.vars.legend.visible) ? true : false,
+			},
 			template: '',
 			dimensionTitle: layout.qHyperCube.qDimensionInfo, //[0].qFallbackTitle
 			measureTitle: layout.qHyperCube.qMeasureInfo, //[0].qFallbackTitle
@@ -381,7 +399,7 @@ define([
 		var tip = d3.tip()
 			.attr('class', vars.id + ' d3-tip')
 			.offset([-10, 0]) 
-			.offsetTop($('#' + vars.id).offset().top) 
+			// .offsetTop(($('#' + vars.id).offset())?$('#' + vars.id).offset().top:0)
 			.html(function(d,i) {
 				var html = '';
 				if (vars.tooltip.dimension) {
@@ -518,7 +536,7 @@ define([
 				d3.select(this).style("fill", vars.bar.colorHover);
 				tip.show(d, i); 
 			})
-			.on('mouseout', function(d,i){
+			.on('mouseleave', function(d,i){
 				tip.hide(); 
 				d3.select(this).style("fill", vars.palette[i-1]);
 			})
@@ -578,7 +596,7 @@ define([
 			});
 
 		// Add legend
-		if (vars.stacked){
+		if (vars.stacked && vars.legend.visible){
 			var columnWidth = '148px';
 			if (vars.width > 500) {
 
