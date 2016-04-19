@@ -1,4 +1,4 @@
-
+/*
 // * {
 // 	-webkit-touch-callout: default !important;
 // 	-webkit-user-select: all !important;
@@ -6,21 +6,18 @@
 // 	-ms-user-select: all !important;
 // 	user-select: all !important;
 // }
-
+*/
+@import url(https://fonts.googleapis.com/css?family=Droid+Sans);
+.senseui-barchart text {
+  font-family: 'Droid Sans', sans-serif !important;
+}
+.senseui-barchart h2 {
+  font-size: 14px !important;
+  margin-top: 0 !important;
+}
 .axis {
   font: 0.9em sans-serif;
 }
-
-// .axis path,
-// .axis line {
-//   fill: none;
-//   stroke: gray;
-//   shape-rendering: crispEdges;
-// }
-
-// .x.axis path {
-//   display: none;
-// }
 .outer,
 .senseui-barchart .content {
 	overflow-y: auto;
@@ -28,22 +25,6 @@
 }
 #xaxis path {
 	fill: #cccccc;
-}
-#xaxis text,
-#yaxis text {
-	fill: #595959;
-}
-#xaxis text,
-#yaxis text,
-.barTextIn,
-.barTextOut {
-  font-size: 11px;
-}
-.senseui-barchart .footer {	
-	// background-color: gray;
-}
-.tick text {
-	fill: #404040;
 }
 #yaxis {
 	fill: none;
@@ -55,21 +36,31 @@
 	cursor: pointer;
 	fill: #77b62a;
 }
-.barTextIn {
-	fill: white;
+.senseui-barchart .legend {
+  /*width: 300px;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;*/
 }
-.barTextOut {
-	fill: #404040;
+.senseui-barchart .legend .column {
+  /*min-width: 148px;*/
+  display: inline-block;
+  /*text-align: left;*/
 }
-
-// D3 TIP
+.senseui-barchart .legend .column .box {
+  width: 10px;
+  height: 10px;
+  margin-right: 10px;
+  display: inline-block;
+}
+/* D3 TIP*/
 .d3-tip {
   line-height: 1.5;
   font-weight: bold;
   padding: 12px;
-  background: rgba(0, 0, 0, 0.9) !important;
+  background: rgba(64,64,64,0.9) !important;
   color: black;
-  border: 1px solid black;
+  border: 1px solid #404040; /* #404040 = 64,64,64 */
   border-radius: 2px;
 }
 /* Creates a small triangle extender for the tooltip */
@@ -122,6 +113,10 @@
 .d3-tip .measure {
 	text-align: right;
 }
+/* QLIK */
 .qv-object-nav {
 	cursor: pointer !important;
+}
+.qv-object .qv-object-title {
+    white-space: normal;
 }
