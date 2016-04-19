@@ -418,9 +418,10 @@ define([
 				.selectAll("text")  
 					.style("text-anchor", "start")
 					.attr("x", "-"+vars.label.width)
-					.attr("y", (vars.bar.height+(vars.bar.padding*2))/2)
-					// .attr("y", 15)
+					// .attr("y", (vars.bar.height+(vars.bar.padding*2))/2)
+					.attr("y", 15)
 					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
+					.attr("dominant-baseline", "central")
 					.call(wrap, vars.label.width);
 		}
 
@@ -457,6 +458,17 @@ define([
 						line = [word];
 						tspan = text.append("tspan").attr("x", -vars.label.width).attr("y", y).attr("dy", lineNumber * lineHeight + dy + "em").text(word);
 					}
+				}
+				if (vars.bar.height>text[0][0].clientHeight) {
+					var textY = (parseInt(y)+(vars.bar.height-text[0][0].clientHeight))/2 + 2;
+					$(this).find("tspan").each(function() {
+						$(this).attr('y',textY);
+					})
+				} else if (vars.bar.height<text[0][0].clientHeight) {
+					var textY = parseInt(y)-(text[0][0].clientHeight-vars.bar.height)/2;
+					$(this).find("tspan").each(function() {
+						$(this).attr('y',textY);
+					})
 				}
 			});
 		}
