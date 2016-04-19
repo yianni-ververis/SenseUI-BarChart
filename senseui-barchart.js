@@ -565,7 +565,7 @@ define([
 			})
 			.text( function(d,i) {
 				if(d.qNum!=='NaN') {
-					if(i>0 && x(d.qNum)>10 && vars.stacked) {
+					if(i>0 && x(d.qNum)>20 && vars.stacked) {
 						return d.qText;
 					} else if (i>0 && !vars.stacked) {
 						return d.qText;
@@ -577,16 +577,16 @@ define([
 					xpos = 0;
 				} else {
 					var xwidth = x(d.qNum);
-					var textWidth = this.getBBox().width+10;
+					var textWidth = this.getBBox().width;
 					if(i>0 && x(d.qNum)>textWidth && vars.stacked) {
 						xpos += xwidth; 
-						return xpos - xwidth + (xwidth/2) - 10;
+						console.log(textWidth);
+						return xpos - xwidth + (xwidth/2) - (textWidth/2);
 					} else if(i>0 && !vars.stacked) {
 						// return (xwidth>textWidth)?xwidth/2 - (textWidth/2) :xwidth + 5;
 						// return (xwidth>textWidth)? xwidth :xwidth + 5;
 						return xwidth + 5;
 					}
-					// return 0;
 				}
 			})
 			.attr('y', function(d,i){
