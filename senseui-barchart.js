@@ -274,7 +274,8 @@ define([
 				visible: layout.vars.yaxis.visible,
 				width: (layout.vars.yaxis.width) ? layout.vars.yaxis.width:150,
 				characters: (layout.vars.yaxis.characters) ? layout.vars.yaxis.characters:50,
-				padding: 15
+				padding: 15,
+				minWidth: 150
 			},
 			footer: {
 				visible: layout.vars.xaxis.visible,
@@ -285,6 +286,9 @@ define([
 			},
 			canvasHeight: null,
 			// legendHeight: 50,
+			css: {
+				breakpoint: 500,
+			},
 			legend: {
 				height: 50,
 				visible: (layout.vars.legend && layout.vars.legend.visible) ? true : false,
@@ -336,9 +340,10 @@ define([
 		var calculatedHeight = vars.data2.length * (vars.bar.height + vars.bar.padding);
 		
 		// Adjust the label width based on viewport
-		// if (vars.width > 500) {
-		// 	vars.label.width = vars.width*0.6;
-		// }
+		if (vars.width < vars.css.breakpoint) {
+			// vars.label.width = vars.width*0.6;
+			vars.label.width = vars.label.minWidth;
+		}
 
 		// $element.append($('<div />;').attr("id", vars.id).width(vars.width).height(vars.height).addClass('outer'));
 		$element.append($(vars.template).width(vars.width).height(vars.height));
@@ -580,7 +585,6 @@ define([
 					var textWidth = this.getBBox().width;
 					if(i>0 && x(d.qNum)>textWidth && vars.stacked) {
 						xpos += xwidth; 
-						console.log(textWidth);
 						return xpos - xwidth + (xwidth/2) - (textWidth/2);
 					} else if(i>0 && !vars.stacked) {
 						// return (xwidth>textWidth)?xwidth/2 - (textWidth/2) :xwidth + 5;
