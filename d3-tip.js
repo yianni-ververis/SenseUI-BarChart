@@ -28,7 +28,7 @@
   return function() {
     var direction = d3_tip_direction,
         offset    = d3_tip_offset,
-        offsetTop = d3_tip_offset_top,
+        extensionData    = extension_data,
         html      = d3_tip_html,
         node      = initNode(),
         svg       = null,
@@ -50,16 +50,18 @@
 
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
-          poffsetTop = offsetTop.apply(this, args),
+          pextensionData = extensionData.apply(this, args),
           dir     = direction.apply(this, args),
           nodel   = getNodeEl(),
           i       = directions.length,
           coords,
-          // scrollTop  = document.documentElement.scrollTop || document.body.scrollTop,
           scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
-      
-      // var scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop;
+
+        if (pextensionData.mashup && $(pextensionData.divid).length>0) {
+          scrollTop -= $('#maincontent').offset().top;
+        }
+
       nodel.html(content)
         .style({ opacity: 1, 'pointer-events': 'all' })
 
@@ -69,10 +71,6 @@
         top: (coords.top +  poffset[0]) + scrollTop + 'px',
         left: (coords.left + poffset[1]) + scrollLeft + 'px'
       })
-
-// console.log($(document).scrollTop());
-// console.log(poffsetTop);
-// console.log(scrollTop);
 
       return tip
     }
@@ -99,6 +97,14 @@
         var args =  Array.prototype.slice.call(arguments)
         d3.selection.prototype.attr.apply(getNodeEl(), args)
       }
+
+      return tip
+    }
+
+    // Get the position data from the extension
+     tip.extensionData = function(v) {
+      if (!arguments.length) return extensionData
+      extensionData = v == null ? v : d3.functor(v)
 
       return tip
     }
@@ -145,14 +151,6 @@
       return tip
     }
 
-    // Returns offset or
-    tip.offsetTop = function(v) {
-      if (!arguments.length) return offsetTop
-      offsetTop = v == null ? v : d3.functor(v)
-
-      return tip
-    }
-
     // Public: sets or gets the html value of the tooltip
     //
     // v - String value of the tip
@@ -178,6 +176,7 @@
 
     function d3_tip_direction() { return 'n' }
     function d3_tip_offset() { return [0, 0] }
+    function extension_data() { return {} }
     function d3_tip_offset_top() { return  ' ' }
     function d3_tip_html() { return ' ' }
 

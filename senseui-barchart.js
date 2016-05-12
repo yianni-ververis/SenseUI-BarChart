@@ -14,7 +14,7 @@ define([
 	// Define properties
 	var me = {
 		initialProperties: {
-			version: 1.0,
+			version: 1.2,
 			qHyperCubeDef: {
 				qDimensions: [],
 				qMeasures: [],
@@ -150,10 +150,25 @@ define([
 							type: "items",
 							label: "Tooltip",
 							items: {
+								// @TODO add show function on all tolltip elements if visible is false
+								toolVisible: {
+									type: "boolean",
+									component: "switch",
+									label: "Show Tooltip?",
+									ref: "vars.tooltip.visible",
+									options: [{
+										value: true,
+										label: "On"
+									}, {
+										value: false,
+										label: "Off"
+									}],
+									defaultValue: true
+								},
 								dimension: {
 									type: "boolean",
 									component: "switch",
-									label: "Show Dimension",
+									label: "Show Dimension?",
 									ref: "vars.tooltip.dimension",
 									options: [{
 										value: true,
@@ -163,7 +178,33 @@ define([
 										label: "Off"
 									}],
 									defaultValue: true
-								}
+								},
+								mashup: {
+									type: "boolean",
+									component: "switch",
+									label: "Will this be in a mashup?",
+									ref: "vars.tooltip.mashup",
+									options: [{
+										value: true,
+										label: "Yes"
+									}, {
+										value: false,
+										label: "No"
+									}],
+									defaultValue: false
+								},
+								mashupDiv: {
+									type: "string",
+									expression: "none",
+									label: "What is the mashup div id to calculate correct positioning",
+									defaultValue: "maincontent",
+									ref: "vars.tooltip.divid",
+									show : function(data) {
+										if (data.vars.tooltip && data.vars.tooltip.mashup) {
+											return true;
+										}
+									}
+								},
 							},
 						},
 						xaxis: {
@@ -248,10 +289,8 @@ define([
 	};
 
 	me.paint = function($element,layout) {
-// console.log(layout);
-// console.log(this);
-// console.log(Theme);
 		var vars = {
+			v: '1.2.1',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -282,7 +321,10 @@ define([
 				height: 20
 			},
 			tooltip: {
+				visible: (layout.vars.tooltip && layout.vars.tooltip.visible)?true:false,
 				dimension: (layout.vars.tooltip && layout.vars.tooltip.dimension)?true:false,
+				mashup: (layout.vars.tooltip && layout.vars.tooltip.mashup)?true:false,
+				divid: (layout.vars.tooltip && layout.vars.tooltip.divid)? layout.vars.tooltip.divid : '#maincontent',
 			},
 			canvasHeight: null,
 			// legendHeight: 50,
@@ -302,8 +344,14 @@ define([
 			palette: (layout.vars.bar.fillColor)? layout.vars.bar.fillColor.split(',') : ['#332288','#88CCEE','#117733','#DDCC77','#CC6677','#3399CC','#CC6666','#99CC66','#275378','#B35A01','#B974FD','#993300','#99CCCC','#669933','#898989','#EDA1A1','#C6E2A9','#D4B881','#137D77','#D7C2EC','#FF5500','#15DFDF','#93A77E','#CB5090','#BFBFBF'],
 			this: this
 		};
-
+		
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
+		// For old uses of the extension
+		// @TODO remove after we check all the mashups that use this extension
+		if (_.isUndefined(layout.vars.tooltip.visible)) {
+			vars.tooltip.visible = true
+		}
+
 		vars.template = '\
 			<div qv-extension class="ng-scope senseui-barchart" id="' + vars.id + '">\
 				<div class="content"></div>\
@@ -380,7 +428,7 @@ define([
 
 		var x = d3.scale.linear()
 			.domain([0,dMax2])
-			.range([0, (vars.label.visible)?vars.width-vars.label.width-40:vars.width]);
+			.range([0, (vars.label.visible)?vars.width-vars.label.width-47:vars.width]);
 
 		var y = d3.scale.linear()
 			.domain([0,vars.data2.length])
@@ -395,16 +443,14 @@ define([
 				.append('svg')
 				.attr({'width':vars.width,'height':vars.footer.height});
 		}
-
 		// Draw the tooltip
 		if ($('.' + vars.id + ' .d3-tip').length > 0) {
 			$('.' + vars.id + ' .d3-tip ').remove();
 		}
-
 		var tip = d3.tip()
 			.attr('class', vars.id + ' d3-tip')
 			.offset([-10, 0]) 
-			// .offsetTop(($('#' + vars.id).offset())?$('#' + vars.id).offset().top:0)
+			.extensionData(vars.tooltip)
 			.html(function(d,i) {
 				var html = '';
 				if (vars.tooltip.dimension) {
@@ -539,7 +585,9 @@ define([
 			.attr("height", vars.bar.height)
 			.on('mouseover', function(d,i){
 				d3.select(this).style("fill", vars.bar.colorHover);
-				tip.show(d, i); 
+				if (vars.tooltip.visible) {
+					tip.show(d, i); 
+				}
 			})
 			.on('mouseleave', function(d,i){
 				tip.hide(); 
@@ -558,19 +606,11 @@ define([
 				return d; 
 			})
 			.enter().append("text")
-			.attr('style', function(d,i) {
-				var style = 'font-size:' + vars.fontSize + ';';
-				if (vars.stacked) {
-					var textColor = (vars.bar.textColor.length>1)?vars.bar.textColor[i-1]:vars.bar.textColor[0];
-					style += 'fill: ' + textColor  + ';';
-				} else {
-					style += (x(d.qNum)>10) ? 'fill: ' + vars.bar.textHoverColor[0]  + ';': 'fill: ' +  vars.color + ';';
-				}
-				return style;
-			})
 			.text( function(d,i) {
+				var xwidth = x(d.qNum);
+				var textWidth = this.getBBox().width;
 				if(d.qNum!=='NaN') {
-					if(i>0 && x(d.qNum)>20 && vars.stacked) {
+					if(i>0 && vars.stacked) {
 						return d.qText;
 					} else if (i>0 && !vars.stacked) {
 						return d.qText;
@@ -583,7 +623,7 @@ define([
 				} else {
 					var xwidth = x(d.qNum);
 					var textWidth = this.getBBox().width;
-					if(i>0 && x(d.qNum)>textWidth && vars.stacked) {
+					if(i>0 && vars.stacked) {
 						xpos += xwidth; 
 						return xpos - xwidth + (xwidth/2) - (textWidth/2);
 					} else if(i>0 && !vars.stacked) {
@@ -597,7 +637,22 @@ define([
 				if(d.qNum!=='NaN') {
 					return y(d.ypos)+22+(vars.bar.height/2);
 				}
-			});
+			})
+			.attr('style', function(d,i) {
+				var xwidth = x(d.qNum);
+				var textWidth = this.getBBox().width;
+				var style = 'font-size:' + vars.fontSize + ';';
+				if (vars.stacked) {
+					var textColor = (vars.bar.textColor.length>1)?vars.bar.textColor[i-1]:vars.bar.textColor[0];
+					style += 'fill: ' + textColor  + ';';
+					if (xwidth<textWidth+5) { // add some padding to the text width
+						style += 'visibility: hidden;';
+					}
+				} else {
+					style += (x(d.qNum)>20) ? 'fill: ' + vars.bar.textHoverColor[0]  + ';': 'fill: ' +  vars.color + ';';
+				}
+				return style;
+			})
 
 		// Add legend
 		if (vars.stacked && vars.legend.visible){
@@ -627,15 +682,13 @@ define([
 			.attr("shape-rendering", "crispEdges")
 			.attr("stroke", '#CCCCCC');
 
-		me.log('info', 'SenseUI-BarChart:', 'Loaded!');
+		me.log('info', 'SenseUI-BarChart ' + vars.v + ':', 'Loaded!');
 	};
 
 	// Controller for binding
-	me.controller =['$scope', '$rootScope', function($scope, $rootScope){
-	}];
+	// me.controller =['$scope', '$rootScope', function($scope, $rootScope){}];
 
 	// me.template = template;
-
 
 	// Custom Logger
 	me.log = function (type, header, message) {
