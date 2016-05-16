@@ -290,7 +290,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.1',
+			v: '1.2.2',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -428,7 +428,7 @@ define([
 
 		var x = d3.scale.linear()
 			.domain([0,dMax2])
-			.range([0, (vars.label.visible)?vars.width-vars.label.width-47:vars.width]);
+			.range([0, (vars.label.visible)?vars.width-vars.label.width-55:vars.width]);
 
 		var y = d3.scale.linear()
 			.domain([0,vars.data2.length])
