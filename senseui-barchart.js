@@ -290,7 +290,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.2',
+			v: '1.2.3',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -682,7 +682,7 @@ define([
 			.attr("shape-rendering", "crispEdges")
 			.attr("stroke", '#CCCCCC');
 
-		me.log('info', 'SenseUI-BarChart ' + vars.v + ':', 'Loaded!');
+		me.log('info', 'SenseUI-BarChart ' + vars.v + ':', '#' + vars.id + ' Loaded!');
 	};
 
 	// Controller for binding
