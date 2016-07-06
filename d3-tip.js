@@ -7,7 +7,8 @@
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module with d3 as a dependency.
     // define(['./d3.min'], factory)
-    define(['./d3.min'], function (d3){
+    // define(['./d3.min'], function (d3){
+    define(['d3'], function (d3){
       d3.tip = factory(d3);
     })
   } else if (typeof module === 'object' && module.exports) {

@@ -5,12 +5,12 @@ define([
 	'underscore',
 	"core.utils/theme",
 	"css!./senseui-barchart.css",
-	// "text!./template.html",
-	// "./d3.min",
+	"d3",
 	'./d3-tip'
-], function(qlik, $, qvangular, _, Theme) {
+], function(qlik, $, qvangular, _, Theme, cssContent, d3) {
 'use strict';
-
+console.log(1)
+console.log(d3)
 	// Define properties
 	var me = {
 		initialProperties: {
@@ -290,7 +290,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.3',
+			v: '1.2.4',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -487,10 +487,11 @@ define([
 				.selectAll("text")  
 					.style("text-anchor", "start")
 					.attr("x", "-"+vars.label.width)
-					// .attr("y", (vars.bar.height+(vars.bar.padding*2))/2)
-					.attr("y", 15)
+					// .attr("y", textYextra)
+					// .attr("y", (vars.bar.height+(vars.bar.padding*2)-textYextra)/2)
+					// .attr("y", 0)
 					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
-					.attr("dominant-baseline", "central")
+					// .attr("dominant-baseline", "central")
 					.call(wrap, vars.label.width);
 		}
 
@@ -508,6 +509,11 @@ define([
 		
 		function wrap(text, width) {
 			text.each(function() {
+var ua=navigator.userAgent, 
+M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
+var textYextra=(M[1]==='Firefox')? 12 : 0;
+console.log(M[1])
+				// console.log(d3.select(this).attr("y"))
 				var text = d3.select(this),
 				words = text.text().split(/\s+/).reverse(),
 				word,
@@ -682,24 +688,13 @@ define([
 			.attr("shape-rendering", "crispEdges")
 			.attr("stroke", '#CCCCCC');
 
-		me.log('info', 'SenseUI-BarChart ' + vars.v + ':', '#' + vars.id + ' Loaded!');
+		console.info('%c SenseUI-BarChart: ', 'color: red', 'v' + vars.v);
 	};
 
 	// Controller for binding
 	// me.controller =['$scope', '$rootScope', function($scope, $rootScope){}];
 
 	// me.template = template;
-
-	// Custom Logger
-	me.log = function (type, header, message) {
-		if (type==='info') {
-			console.info('%c ' + header + ': ', 'color: red', message);
-		} else if (type==='error') {
-			console.error('%c ' + header + ': ', 'color: red', message);
-		} else {
-			console.log('%c ' + header + ': ', 'color: red', message);
-		}
-	};
 
 	return me;
 });
