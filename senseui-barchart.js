@@ -9,8 +9,6 @@ define([
 	'./d3-tip'
 ], function(qlik, $, qvangular, _, Theme, cssContent, d3) {
 'use strict';
-console.log(1)
-console.log(d3)
 	// Define properties
 	var me = {
 		initialProperties: {
@@ -290,7 +288,7 @@ console.log(d3)
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.4',
+			v: '1.2.5',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -482,14 +480,11 @@ console.log(d3)
 				.attr("transform", "translate("+vars.label.width+", -10)")
 				.attr('id','yaxis')
 				.attr('width', vars.label.width-10)
-
 			y_xis.call(yAxis)
 				.selectAll("text")  
 					.style("text-anchor", "start")
 					.attr("x", "-"+vars.label.width)
-					// .attr("y", textYextra)
-					// .attr("y", (vars.bar.height+(vars.bar.padding*2)-textYextra)/2)
-					// .attr("y", 0)
+					.attr("y", vars.label.padding) // SOLUTION 1
 					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
 					// .attr("dominant-baseline", "central")
 					.call(wrap, vars.label.width);
@@ -509,11 +504,6 @@ console.log(d3)
 		
 		function wrap(text, width) {
 			text.each(function() {
-var ua=navigator.userAgent, 
-M=ua.match(/(opera|chrome|safari|firefox|msie|trident(?=\/))\/?\s*(\d+)/i) || [];
-var textYextra=(M[1]==='Firefox')? 12 : 0;
-console.log(M[1])
-				// console.log(d3.select(this).attr("y"))
 				var text = d3.select(this),
 				words = text.text().split(/\s+/).reverse(),
 				word,
@@ -534,17 +524,12 @@ console.log(M[1])
 						tspan = text.append("tspan").attr("x", -vars.label.width).attr("y", y).attr("dy", lineNumber * lineHeight + dy + "em").text(word);
 					}
 				}
-				if (vars.bar.height>text[0][0].clientHeight) {
-					var textY = (parseInt(y)+(vars.bar.height-text[0][0].clientHeight))/2 + 2;
-					$(this).find("tspan").each(function() {
-						$(this).attr('y',textY);
-					})
-				} else if (vars.bar.height<text[0][0].clientHeight) {
-					var textY = parseInt(y)-(text[0][0].clientHeight-vars.bar.height)/2;
-					$(this).find("tspan").each(function() {
-						$(this).attr('y',textY);
-					})
-				}
+				// Align label at the middle of the bar
+				var textHeight = text[0][0].getBBox().height;
+				var textY = (vars.bar.height>textHeight) ? parseInt(y) + (vars.bar.height/2) - (textHeight/2) : parseInt(y);
+				$(this).find("tspan").each(function() {
+					$(this).attr('y',textY);
+				})
 			});
 		}
 
