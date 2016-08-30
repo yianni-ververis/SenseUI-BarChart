@@ -7,8 +7,8 @@
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module with d3 as a dependency.
     // define(['./d3.min'], factory)
-    // define(['./d3.min'], function (d3){
-    define(['d3'], function (d3){
+    define(['./d3.min'], function (d3){
+    // define(['d3'], function (d3){
       d3.tip = factory(d3);
     })
   } else if (typeof module === 'object' && module.exports) {
@@ -38,8 +38,10 @@
 
     function tip(vis) {
       svg = getSVGNode(vis)
-      point = svg.createSVGPoint()
-      document.body.appendChild(node)
+      if (svg){
+        point = svg.createSVGPoint()
+        document.body.appendChild(node)
+      }
     }
 
     // Public - show the tooltip on the screen
@@ -272,6 +274,8 @@
         'color': 'white',
         'border-radius': '5px',
         'max-width': '350px',
+        '-webkit-transition': 'opacity 1s', /* Safari */
+        'transition': 'opacity 1s',
         'z-index': '1022', // 1021 is the .qv-tooltip
       })
 

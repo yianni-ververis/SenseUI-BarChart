@@ -5,7 +5,7 @@ define([
 	'underscore',
 	"core.utils/theme",
 	"css!./senseui-barchart.css",
-	"d3",
+	"./d3.min",
 	'./d3-tip'
 ], function(qlik, $, qvangular, _, Theme, cssContent, d3) {
 'use strict';
@@ -288,7 +288,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.5',
+			v: '1.2.7',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -346,7 +346,7 @@ define([
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
 		// For old uses of the extension
 		// @TODO remove after we check all the mashups that use this extension
-		if (_.isUndefined(layout.vars.tooltip.visible)) {
+		if (_.isUndefined(layout.vars.tooltip) || _.isUndefined(layout.vars.tooltip.visible)) {
 			vars.tooltip.visible = true
 		}
 
@@ -578,6 +578,7 @@ define([
 				d3.select(this).style("fill", vars.bar.colorHover);
 				if (vars.tooltip.visible) {
 					tip.show(d, i); 
+					setTimeout(function(){tip.hide();}, 5000);
 				}
 			})
 			.on('mouseleave', function(d,i){
