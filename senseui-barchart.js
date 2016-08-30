@@ -141,6 +141,20 @@ define([
 										label: "Off"
 									}],
 									defaultValue: true
+								},
+								lollipop: {
+									type: "boolean",
+									component: "switch",
+									label: "Lollipop View",
+									ref: "vars.bar.lollipop",
+									options: [{
+										value: true,
+										label: "On"
+									}, {
+										value: false,
+										label: "Off"
+									}],
+									defaultValue: false
 								}
 							},
 						},
@@ -288,7 +302,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.7',
+			v: '1.2.8',
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -305,7 +319,8 @@ define([
 				colorHover: (layout.vars.bar.fillHoverColor)?layout.vars.bar.fillHoverColor:'#77b62a',
 				textColor: (layout.vars.bar.textColor)?layout.vars.bar.textColor.split(','):['#000000'],
 				textHoverColor: (layout.vars.bar.textHoverColor)?layout.vars.bar.textHoverColor:'#000000',
-				borderColor: (layout.vars.bar.borderColor)?layout.vars.bar.borderColor:'#404040'
+				borderColor: (layout.vars.bar.borderColor)?layout.vars.bar.borderColor:'#404040',
+				lollipop: (!_.isUndefined(layout.vars.bar.lollipop) && layout.vars.bar.lollipop)?true:false
 			},
 			label: {
 				visible: layout.vars.yaxis.visible,
@@ -347,7 +362,13 @@ define([
 		// For old uses of the extension
 		// @TODO remove after we check all the mashups that use this extension
 		if (_.isUndefined(layout.vars.tooltip) || _.isUndefined(layout.vars.tooltip.visible)) {
-			vars.tooltip.visible = true
+			vars.tooltip.visible = true;
+		}
+
+		// Create a lollipop chart
+		if (vars.bar.lollipop) {
+			vars.bar.height = 2;
+			vars.bar.padding = 10;
 		}
 
 		vars.template = '\
@@ -358,7 +379,6 @@ define([
 			vars.template += '<div class="footer"></div>';
 		};
 		vars.template += '</div>';
-
 		// Adjust label width based on the parent window
 		// if (vars.width <= 200 && vars.label.visible) {
 		// 	vars.label.width = 50;
@@ -646,6 +666,29 @@ define([
 				return style;
 			})
 
+		// Lollipop
+		if (vars.bar.lollipop){
+			bars2.selectAll('#' + vars.id + ' bars') 
+				.append('path')
+				.data(function(d,j) { 
+					return d; 
+				})
+				.enter().append("path")
+				.attr('style', function(d,i){
+					return '\
+						fill: ' + vars.palette[i-1] + '; \
+						stroke-width:' + vars.bar.border + '; \
+						stroke: ' + vars.bar.borderColor + ';\
+					';
+				})
+				.attr("transform", function(d,i) { 
+					if(i>0 && !vars.stacked) {
+						return "translate(" +  (x(d.qNum)-5) + "," + (y(d.ypos)+20) + ")"; 
+					}
+				})
+				.attr("d", d3.svg.symbol().size(128));
+
+		}
 		// Add legend
 		if (vars.stacked && vars.legend.visible){
 			var columnWidth = '148px';
