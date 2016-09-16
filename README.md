@@ -10,15 +10,15 @@ A more elegant and Mobile Friendly Bar Chart for Qlik Sense
 
 ## Usage
 
-##### Dimensions and Measures
+#### Dimensions and Measures
 - Set 1 dimension for the Labels and
 - up to 5 Measures for Grouped, Stacked Bar or Lollipop
 
-##### General Settings
+#### General Settings
 - Text Color
 - Font Size
 
-##### Bar 
+#### Bar 
 - Height
 - Comma separated colors for the stacked bar fill color
 - Fill color when you mouse over
@@ -29,15 +29,15 @@ A more elegant and Mobile Friendly Bar Chart for Qlik Sense
 - Enable Selections
 - Toggle between Stacked and Grouped Bar Chart
 
-##### Tooltip
+#### Tooltip
 - Enable Tooltip
 - Show Dimension in the Tooltip
 
-##### X-Axis
+#### X-Axis
 - Show X-Axis
 - Show Legend (check Stacked Bar image below)
 
-##### Y-Axis
+#### Y-Axis
 - Show Y-Axis
 - Label Width (Usually 150px, even for the smallest device )
 - Number of visible characters, if you want to truncate your labels. 
