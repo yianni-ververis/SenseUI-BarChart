@@ -155,6 +155,25 @@ define([
 										label: "Off"
 									}],
 									defaultValue: false
+								},
+								grouped: {
+									type: "boolean",
+									component: "switch",
+									label: "Grouped View",
+									ref: "vars.bar.grouped",
+									options: [{
+										value: true,
+										label: "On"
+									}, {
+										value: false,
+										label: "Off"
+									}],
+									defaultValue: false,
+									show : function(data) {
+										if (data.qHyperCubeDef.qMeasures.length>1) {
+											return true;
+										}
+									}
 								}
 							},
 						},
@@ -302,13 +321,15 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '1.2.8',
+			v: '2.0.0', // 2.0.0 - Added Grouped Barc Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
 			height: $element.height(),
 			width: $element.width(),
-			stacked: (layout.qHyperCube.qSize.qcx > 2) ? true : false,	
+			qcx: layout.qHyperCube.qSize.qcx,
+			// stacked: (!_.isUndefined(layout.vars.bar.stacked) && layout.vars.bar.stacked)?true:false,
+			stacked: (layout.qHyperCube.qSize.qcx > 2) ? true : false,
 			color: (layout.vars.color)?layout.vars.color:'#000000',
 			fontSize: (layout.vars.fontSize)?layout.vars.fontSize + 'px':'11px',
 			bar: {
@@ -318,9 +339,11 @@ define([
 				color: (layout.vars.bar.fillColor)?layout.vars.bar.fillColor:'#4477AA',
 				colorHover: (layout.vars.bar.fillHoverColor)?layout.vars.bar.fillHoverColor:'#77b62a',
 				textColor: (layout.vars.bar.textColor)?layout.vars.bar.textColor.split(','):['#000000'],
-				textHoverColor: (layout.vars.bar.textHoverColor)?layout.vars.bar.textHoverColor:'#000000',
+				textHoverColor: (layout.vars.bar.textHoverColor)?layout.vars.bar.textHoverColor.split(','):['#000000'],
 				borderColor: (layout.vars.bar.borderColor)?layout.vars.bar.borderColor:'#404040',
-				lollipop: (!_.isUndefined(layout.vars.bar.lollipop) && layout.vars.bar.lollipop)?true:false
+				lollipop: (!_.isUndefined(layout.vars.bar.lollipop) && layout.vars.bar.lollipop)?true:false,
+				grouped: (!_.isUndefined(layout.vars.bar.grouped) && layout.vars.bar.grouped)?true:false,
+				// grouped: (layout.qHyperCube.qSize.qcx > 2) ? true : false,
 			},
 			label: {
 				visible: layout.vars.yaxis.visible,
@@ -357,7 +380,7 @@ define([
 			palette: (layout.vars.bar.fillColor)? layout.vars.bar.fillColor.split(',') : ['#332288','#88CCEE','#117733','#DDCC77','#CC6677','#3399CC','#CC6666','#99CC66','#275378','#B35A01','#B974FD','#993300','#99CCCC','#669933','#898989','#EDA1A1','#C6E2A9','#D4B881','#137D77','#D7C2EC','#FF5500','#15DFDF','#93A77E','#CB5090','#BFBFBF'],
 			this: this
 		};
-		
+				
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
 		// For old uses of the extension
 		// @TODO remove after we check all the mashups that use this extension
@@ -369,6 +392,11 @@ define([
 		if (vars.bar.lollipop) {
 			vars.bar.height = 2;
 			vars.bar.padding = 10;
+		}
+
+		// Toggle Stacked bar based on the grouped chart settings
+		if (vars.bar.grouped) {
+			vars.stacked = false;
 		}
 
 		vars.template = '\
@@ -424,6 +452,7 @@ define([
 		// Get the first measure for max for now
 
 		// Loop through results
+		var tempYpos = 0;
 		for (var i = 0; i < vars.data2.length; i++) {
 			vars.data2[i].total = 0;
 			// Loop through the Measures in the results. 0 is assumed to be the Dimension
@@ -435,26 +464,33 @@ define([
 				// Assign the qElemNumber on every measure so we can access it from d3 on each element and enable selections
 				vars.data2[i][j].qElemNumber = vars.data2[i][0].qElemNumber;
 				vars.data2[i][j].ypos = i; // The parent array index
+				// vars.data2[i][j].ypos = (vars.bar.grouped) ? tempYpos : i; // The parent array index
 				vars.data2[i][j].xpos = 0; // The x position for the stacked bar
 				vars.data2[i][j].dist = 0;
 				vars.data2[i][j].width = 0;
+				tempYpos += 1;
 			}
 		}
 		var dMax2 = d3.max(vars.data2, function(d) { return d.total; });
 
-		vars.canvasHeight = vars.data.length * (vars.bar.height+(vars.bar.padding*2)+3) ;
+		// if (vars.bar.grouped && !vars.stacked) {
+		// 	vars.canvasHeight = vars.data2.length * ((vars.bar.height*(vars.qcx-1))+(vars.bar.padding*2)+3);
+		// 	// vars.canvasHeight = vars.data2.length * (vars.bar.height+(vars.bar.padding*2)+3);
+		// } else {
+			vars.canvasHeight = vars.data2.length * (vars.bar.height+(vars.bar.padding*2)+3);
+		// }
 
 		var x = d3.scale.linear()
 			.domain([0,dMax2])
 			.range([0, (vars.label.visible)?vars.width-vars.label.width-55:vars.width]);
 
 		var y = d3.scale.linear()
-			.domain([0,vars.data2.length])
+			.domain([0, (!vars.stacked) ? vars.data2.length/(vars.qcx-1) : vars.data2.length])
 			.range([10,vars.canvasHeight]);
 
 		var svg = d3.select('#' + vars.id + ' .content')
 			.append('svg')
-			.attr({'width':vars.width,'height':vars.canvasHeight});
+			.attr({'width':vars.width,'height':(vars.bar.grouped && !vars.stacked)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight});
 
 		if (vars.footer.visible) {
 			var svgFooter = d3.select('#' + vars.id + ' .footer')
@@ -488,11 +524,11 @@ define([
 		var	yAxis = d3.svg.axis()
 			.scale(y)
 			.orient('left')
-			.tickSize(1)
+			// .tickSize(2)
 			.tickFormat(function(d,i){
 				return vars.data2[i][0].qText; 
 			})
-			.tickValues(d3.range(vars.data.length)); //1167
+			.tickValues(d3.range(vars.data2.length)); //1167
 
 		// Y Axis labels
 	 	if (vars.label.visible){
@@ -500,11 +536,11 @@ define([
 				.attr("transform", "translate("+vars.label.width+", -10)")
 				.attr('id','yaxis')
 				.attr('width', vars.label.width-10)
-			y_xis.call(yAxis)
+			y_xis.call(yAxis) //layout.qHyperCube.qSize.qcx 
 				.selectAll("text")  
 					.style("text-anchor", "start")
 					.attr("x", "-"+vars.label.width)
-					.attr("y", vars.label.padding) // SOLUTION 1
+					.attr("y", vars.label.padding) // SOLUTION 1 
 					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
 					// .attr("dominant-baseline", "central")
 					.call(wrap, vars.label.width);
@@ -522,6 +558,7 @@ define([
 			    );
 		}
 		
+		// Wrap the text labels into the bounding box
 		function wrap(text, width) {
 			text.each(function() {
 				var text = d3.select(this),
@@ -553,12 +590,16 @@ define([
 			});
 		}
 
+		// Position Indexes
 		var xpos = 0;
+		var ypos = 0;
+		var yposText = 0;
 
+		//Create the Bars
 		var bars2 = svg.selectAll(".content")
 			.data(vars.data2)
 			.enter().append("g")
-			.attr("transform", "translate("+((vars.label.visible)?vars.label.width:0)+",-20)") //-20
+			.attr("transform", "translate("+((vars.label.visible)?vars.label.width:0)+",-22)") //-20
 			.attr('class','bars');
 
 		bars2.selectAll('#' + vars.id + ' bars') //
@@ -575,22 +616,49 @@ define([
 					cursor: pointer;\
 				';
 			})
-			.attr("x", function(d,i) {
-				if (i==0) {
-					xpos = 0;
+			.attr('width', function(d,i){
+				if (vars.bar.grouped) {
+						// console.log(i)
+						// console.log(d)
+					if(d.qNum!=='NaN' && i!=0) { // i=0 is the dimension legend
+						return x(d.qNum);
+					}
 				} else {
-					xpos += x(d.qNum); 
-					return xpos - x(d.qNum);
+					if(d.qNum!=='NaN') {
+						// console.log(d)
+						return x(d.qNum);
+					}
 				}
 			})
-			.attr('width', function(d,i){
-				if(d.qNum!=='NaN') {
-					return x(d.qNum);
+			.attr("x", function(d,i) {
+				if (vars.bar.grouped && !vars.stacked) {
+					return 0;
+				} else {
+					if (i==0) {
+						xpos = 0;
+						return 0;
+					} else {
+						xpos += x(d.qNum); 
+						return xpos - x(d.qNum);
+					}
 				}
 			})
 			.attr('y', function(d,i){
-				if(d.qNum!=='NaN') {
-					return y(d.ypos)+19;
+				if (vars.bar.grouped && !vars.stacked) {
+					if (i==0) { // Dimension / Label
+						ypos = y(d.ypos);
+						// return false;
+					} else if (i==vars.qcx-1) {
+						ypos += vars.bar.height + 20; 
+						return ypos -20;
+					} else {
+						ypos += vars.bar.height; 
+						return ypos;
+					}
+				} else {
+					if(d.qNum!=='NaN') {
+						return y(d.ypos)+19;
+					}
 				}
 			})
 			.attr("height", vars.bar.height)
@@ -598,7 +666,7 @@ define([
 				d3.select(this).style("fill", vars.bar.colorHover);
 				if (vars.tooltip.visible) {
 					tip.show(d, i); 
-					setTimeout(function(){tip.hide();}, 5000);
+					setTimeout(function(){tip.hide();}, 10000);
 				}
 			})
 			.on('mouseleave', function(d,i){
@@ -612,6 +680,7 @@ define([
 				}
 			});
 
+		// Add the Text labels onto the Bars
 		bars2.selectAll('#' + vars.id + ' bars') 
 			.append('text')
 			.data(function(d,j) { 
@@ -621,12 +690,14 @@ define([
 			.text( function(d,i) {
 				var xwidth = x(d.qNum);
 				var textWidth = this.getBBox().width;
-				if(d.qNum!=='NaN') {
+				if(d.qNum!=='NaN' && i!=0) {
 					if(i>0 && vars.stacked) {
 						return d.qText;
 					} else if (i>0 && !vars.stacked) {
 						return d.qText;
 					}
+				} else {
+					return null;
 				}
 			})
 			.attr('x', function(d,i){
@@ -638,16 +709,32 @@ define([
 					if(i>0 && vars.stacked) {
 						xpos += xwidth; 
 						return xpos - xwidth + (xwidth/2) - (textWidth/2);
-					} else if(i>0 && !vars.stacked) {
-						// return (xwidth>textWidth)?xwidth/2 - (textWidth/2) :xwidth + 5;
-						// return (xwidth>textWidth)? xwidth :xwidth + 5;
+					} else if (i>0 && vars.bar.grouped) {
+						if (textWidth+(vars.bar.padding*2) > xwidth) {
+							return xwidth + 5;
+						} else {
+							return (xwidth/2) - (textWidth/2);
+						}
+					} else {
 						return xwidth + 5;
 					}
 				}
 			})
 			.attr('y', function(d,i){
-				if(d.qNum!=='NaN') {
-					return y(d.ypos)+22+(vars.bar.height/2);
+				if (vars.bar.grouped && !vars.stacked) {
+					if (i==0) { // Dimension / Label
+						yposText = y(d.ypos)+(vars.bar.height/2)+4;
+					} else if (i==vars.qcx-1) {
+						yposText += vars.bar.height + 20; 
+						return yposText -20;
+					} else {
+						yposText += vars.bar.height; 
+						return yposText;
+					}
+				} else {
+					if(d.qNum!=='NaN') {
+						return y(d.ypos)+vars.bar.height;
+					}
 				}
 			})
 			.attr('style', function(d,i) {
@@ -661,7 +748,12 @@ define([
 						style += 'visibility: hidden;';
 					}
 				} else {
-					style += (x(d.qNum)>20) ? 'fill: ' + vars.bar.textHoverColor[0]  + ';': 'fill: ' +  vars.color + ';';
+					if (textWidth+(vars.bar.padding*2) > xwidth) {
+						style += ' fill: ' + vars.color  + ';';
+					} else {
+						style += ' fill: ' + vars.bar.textHoverColor[0]  + ';';
+					}
+					// style += (x(d.qNum)>20) ? 'fill: ' + vars.bar.textHoverColor[0]  + ';': 'fill: ' +  vars.color + ';';
 				}
 				return style;
 			})
@@ -687,13 +779,11 @@ define([
 					}
 				})
 				.attr("d", d3.svg.symbol().size(128));
-
 		}
 		// Add legend
-		if (vars.stacked && vars.legend.visible){
+		if ((vars.stacked || vars.bar.grouped) && vars.legend.visible){
 			var columnWidth = '148px';
 			if (vars.width > 500) {
-
 				columnWidth = (vars.width-10) / (vars.measureTitle.length) + 'px'; 
 			}
 			var legend = '\

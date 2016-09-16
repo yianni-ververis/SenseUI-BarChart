@@ -8,7 +8,10 @@ A more elegant and Mobile Friendly Bar Chart for Qlik Sense
 
 ![SenseUI - Bar Chart](/stackedBar.png?raw=true "Stacked Bar")
 
-## Or convert it into a Lollipop
+## Lollipop
 ![SenseUI - Bar Chart](/lollipop.png?raw=true "Lollipop")
+
+## Grouped Bar Chart
+![SenseUI - Bar Chart](/grouped.png?raw=true "Grouped Bar Chart")
 
 [Download zip file](https://github.com/yianni-ververis/SenseUI-BarChart/archive/master.zip)
