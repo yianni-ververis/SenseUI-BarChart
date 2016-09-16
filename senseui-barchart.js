@@ -540,7 +540,7 @@ define([
 				.selectAll("text")  
 					.style("text-anchor", "start")
 					.attr("x", "-"+vars.label.width)
-					.attr("y", vars.label.padding) // SOLUTION 1 
+					.attr("y", (vars.bar.grouped) ? (vars.bar.height*vars.qcx)/2 : vars.label.padding) // SOLUTION 1 
 					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
 					// .attr("dominant-baseline", "central")
 					.call(wrap, vars.label.width);
@@ -725,7 +725,7 @@ define([
 					if (i==0) { // Dimension / Label
 						yposText = y(d.ypos)+(vars.bar.height/2)+4;
 					} else if (i==vars.qcx-1) {
-						yposText += vars.bar.height + 20; 
+						yposText += vars.bar.height + (vars.bar.height/2) + vars.bar.padding; 
 						return yposText -20;
 					} else {
 						yposText += vars.bar.height; 
@@ -733,7 +733,7 @@ define([
 					}
 				} else {
 					if(d.qNum!=='NaN') {
-						return y(d.ypos)+vars.bar.height;
+						return y(d.ypos)+(vars.bar.height/2)+22;
 					}
 				}
 			})
@@ -743,7 +743,7 @@ define([
 				var style = 'font-size:' + vars.fontSize + ';';
 				if (vars.stacked) {
 					var textColor = (vars.bar.textColor.length>1)?vars.bar.textColor[i-1]:vars.bar.textColor[0];
-					style += 'fill: ' + textColor  + ';';
+						style += 'fill: ' + textColor  + ';';
 					if (xwidth<textWidth+5) { // add some padding to the text width
 						style += 'visibility: hidden;';
 					}
@@ -757,7 +757,7 @@ define([
 				}
 				return style;
 			})
-
+			
 		// Lollipop
 		if (vars.bar.lollipop){
 			bars2.selectAll('#' + vars.id + ' bars') 
