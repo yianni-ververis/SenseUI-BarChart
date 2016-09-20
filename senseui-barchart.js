@@ -725,8 +725,9 @@ define([
 					if (i==0) { // Dimension / Label
 						yposText = y(d.ypos)+(vars.bar.height/2)+4;
 					} else if (i==vars.qcx-1) {
-						yposText += vars.bar.height + (vars.bar.height/2) + vars.bar.padding; 
-						return yposText -20;
+						console.log(vars.bar.padding);
+						yposText += vars.bar.height + (vars.bar.height/2); 
+						return yposText - (vars.bar.height/2);
 					} else {
 						yposText += vars.bar.height; 
 						return yposText;
