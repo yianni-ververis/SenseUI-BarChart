@@ -318,9 +318,13 @@ define([
 		canTakeSnapshot : true
 	};
 
+	me.support = {
+		export: true
+	};
+
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.1', // 2.0.0 - Added Grouped Barc Chart 
+			v: '2.0.2', // 2.0.0 - Added Grouped Barc Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -808,6 +812,8 @@ define([
 			.attr("stroke", '#CCCCCC');
 
 		console.info('%c SenseUI-BarChart: ', 'color: red', 'v' + vars.v);
+
+		return qlik.Promise.resolve();
 	};
 
 	// Controller for binding
