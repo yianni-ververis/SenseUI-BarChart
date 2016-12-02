@@ -3,10 +3,11 @@ define([
 	"jquery",
 	"qvangular",
 	'underscore',
+	"core.utils/theme",
 	"css!./senseui-barchart.css",
 	"./d3.min",
 	'./d3-tip'
-], function(qlik, $, qvangular, _, cssContent, d3) {
+], function(qlik, $, qvangular, _, Theme, cssContent, d3) {
 'use strict';
 	// Define properties
 	var me = {
@@ -28,7 +29,7 @@ define([
 				dimensions: {
 					uses: "dimensions",
 					min: 1,
-					max: 2
+					max: 1
 				},
 				measures: {
 					uses: "measures",
@@ -319,10 +320,11 @@ define([
 	};
 
 	me.paint = function($element,layout) {
+console.log(layout)				
 		var vars = {
-			v: '2.0.1', // 2.0.0 - Added Grouped Barc Chart 
+			v: '2.0.0', // 2.0.0 - Added Grouped Barc Chart 
 			id: layout.qInfo.qId,
-			data: layout.qHyperCube.qDataPages[0].qMatrix,
+			// data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
 			height: $element.height(),
 			width: $element.width(),
@@ -379,7 +381,7 @@ define([
 			palette: (layout.vars.bar.fillColor)? layout.vars.bar.fillColor.split(',') : ['#332288','#88CCEE','#117733','#DDCC77','#CC6677','#3399CC','#CC6666','#99CC66','#275378','#B35A01','#B974FD','#993300','#99CCCC','#669933','#898989','#EDA1A1','#C6E2A9','#D4B881','#137D77','#D7C2EC','#FF5500','#15DFDF','#93A77E','#CB5090','#BFBFBF'],
 			this: this
 		};
-				
+console.log(vars)				
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
 		// For old uses of the extension
 		// @TODO remove after we check all the mashups that use this extension
@@ -413,14 +415,14 @@ define([
 		// 	vars.label.width = 80;
 		// }	
 
-		vars.data = vars.data.map(function(d) {
-			return {
-				"dimension":d[0].qText,
-				"measure":d[1].qText,
-				"measureNum":d[1].qNum,
-				"qElemNumber":d[0].qElemNumber,
-			}
-		});
+		// vars.data = vars.data.map(function(d) {
+		// 	return {
+		// 		"dimension":d[0].qText,
+		// 		"measure":d[1].qText,
+		// 		"measureNum":d[1].qNum,
+		// 		"qElemNumber":d[0].qElemNumber,
+		// 	}
+		// });
 		
 		// CSS
 		$( '#' + vars.id ).css( "color", vars.color );
@@ -447,7 +449,8 @@ define([
 			$('#' + vars.id + ' .content').height(vars.height);
 		}
 
-		var dMax = d3.max(vars.data, function(d) { return d.measureNum; });
+		var dMax = d3.max(vars.data2, function(d) { return d.measureNum; });
+		// var dMax = d3.max(vars.data, function(d) { return d.measureNum; });
 		// Get the first measure for max for now
 
 		// Loop through results
@@ -456,12 +459,15 @@ define([
 			vars.data2[i].total = 0;
 			// Loop through the Measures in the results. 0 is assumed to be the Dimension
 			for (var j = 0; j < vars.data2[i].length; j++) {
+				vars.data2[i][j].qElemNumberDimension = i;
+				vars.data2[i][j].qElemNumberMeasure = j;
 				if (j==0){
 					vars.data2[i][j].qNum = 0;
 				}
 				vars.data2[i].total += (j>0)?vars.data2[i][j].qNum:0;
-				// Assign the qElemNumber on every measure so we can access it from d3 on each element and enable selections
-				vars.data2[i][j].qElemNumber = vars.data2[i][0].qElemNumber;
+				// Assign the qElemNumber on every measure so we can access it from d3 on each element and enable selections on the DIMENSION
+				vars.data2[i][j].qElemNumber2 = vars.data2[i][0].qElemNumber;
+				// vars.data2[i][j].dimension = vars.data2[i][0].qText;
 				vars.data2[i][j].ypos = i; // The parent array index
 				// vars.data2[i][j].ypos = (vars.bar.grouped) ? tempYpos : i; // The parent array index
 				vars.data2[i][j].xpos = 0; // The x position for the stacked bar
@@ -675,7 +681,17 @@ define([
 			.on('click', function(d,i) {
 				tip.hide();
 				if (vars.enableSelections) {
-					vars.this.backendApi.selectValues(0, [d.qElemNumber], false);
+					console.log(d)
+					// console.log(vars.data2)
+					// console.log(vars.this.backendApi.model.enigmaModel.listeners)
+					if (!vars.bar.grouped && vars.stacked) {
+						console.log(d.qElemNumber2)
+						console.log(vars.this.backendApi.getDimensionInfos)
+						console.log(vars.this.backendApi.getMeasureInfos)
+						// vars.this.backendApi.selectValues(0, [4], false);
+					} else {
+						// vars.this.backendApi.selectValues(0, [d.qElemNumber2], false);
+					}
 				}
 			});
 
