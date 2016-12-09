@@ -324,7 +324,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.2', // 2.0.0 - Added Grouped Barc Chart 
+			v: '2.0.2', // 2.0.0 - Added Grouped Bar Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
