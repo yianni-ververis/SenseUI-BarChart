@@ -324,7 +324,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.2', // 2.0.0 - Added Grouped Bar Chart 
+			v: '2.0.3', // 2.0.0 - Added Grouped Bar Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -811,7 +811,7 @@ define([
 			.attr("shape-rendering", "crispEdges")
 			.attr("stroke", '#CCCCCC');
 
-		console.info('%c SenseUI-BarChart: ', 'color: red', 'v' + vars.v);
+		console.info(`%c SenseUI-BarChart ${vars.v}: `, 'color: red', `#${vars.id} Loaded!`);
 
 		return qlik.Promise.resolve();
 	};
