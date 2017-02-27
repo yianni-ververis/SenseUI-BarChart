@@ -1,3 +1,15 @@
+/**
+ * @name SenseUI-BarChart
+ * @author yianni.ververis@qlik.com
+ * @param {object} dimension - Field to get the data from
+ * @param {string} id - Div id for scope manipulation
+ * @param {string} title - Initial text for the dropdown
+ * @description
+ * 
+ * @version 2.1.0: Added Horizontal Bar Chart 
+ * @version 2.0.0: Added Grouped Bar Chart 
+ */
+
 define([
 	"qlik",
 	"jquery",
@@ -593,6 +605,17 @@ define([
 			});
 		}
 
+		// helper Function to round the displayed numbers
+		let roundNumber = (num) => {
+			num = Math.round(num);
+			if (num >= 1000 && num<1000000) {
+				num = Math.round(num/1000) + 'K'
+			} else if (num >= 1000000) {
+				num = Math.round(num/1000000) + 'M'
+			}
+			return num;
+		}
+
 		// Position Indexes
 		var xpos = 0;
 		var ypos = 0;
@@ -693,11 +716,13 @@ define([
 			.text( function(d,i) {
 				var xwidth = x(d.qNum);
 				var textWidth = this.getBBox().width;
-				if(d.qNum!=='NaN' && i!=0) {
+				if(d.qNum!=='NaN' && i>=0) {
 					if(i>0 && vars.stacked) {
-						return d.qText;
+						// return d.qText;
+						return roundNumber(d.qText);
 					} else if (i>0 && !vars.stacked) {
-						return d.qText;
+						// return d.qText;
+						return roundNumber(d.qText);
 					}
 				} else {
 					return null;
