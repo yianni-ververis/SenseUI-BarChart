@@ -71,6 +71,27 @@ define([
 									defaultValue: "11",
 									ref: "vars.fontSize"
 								},
+								precision: {
+									type: "integer",
+									expression: "none",
+									label: "Precision Digits",
+									defaultValue: 0,
+									ref: "vars.precision"
+								},
+								precision: {
+									type: "boolean",
+									component: "switch",
+									label: "Display decimals?",
+									ref: "vars.precision",
+									options: [{
+										value: true,
+										label: "Yes"
+									}, {
+										value: false,
+										label: "No"
+									}],
+									defaultValue: false
+								},
 							},
 						},
 						bar: {
@@ -336,7 +357,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.3', // 2.0.0 - Added Grouped Bar Chart 
+			v: '2.0.5', // 2.0.0 - Added Grouped Bar Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -347,6 +368,7 @@ define([
 			stacked: (layout.qHyperCube.qSize.qcx > 2) ? true : false,
 			color: (layout.vars.color)?layout.vars.color:'#000000',
 			fontSize: (layout.vars.fontSize)?layout.vars.fontSize + 'px':'11px',
+			precision: (!layout.vars.precision)? false : true,
 			bar: {
 				height: (layout.vars.bar.height)?layout.vars.bar.height:20,
 				padding: (layout.vars.bar.spacing)?layout.vars.bar.spacing:3,
@@ -607,11 +629,11 @@ define([
 
 		// helper Function to round the displayed numbers
 		let roundNumber = (num) => {
-			num = Math.round(num);
+			num = (vars.precision) ? parseFloat(num).toFixed(2) : Math.round(num);
 			if (num >= 1000 && num<1000000) {
-				num = Math.round(num/1000) + 'K'
+				num = (vars.precision) ? parseFloat(num/1000).toFixed(2)  + 'K' : Math.round(num/1000) + 'K';
 			} else if (num >= 1000000) {
-				num = Math.round(num/1000000) + 'M'
+				num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
 			}
 			return num;
 		}
