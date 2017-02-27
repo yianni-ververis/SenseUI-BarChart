@@ -525,7 +525,7 @@ define([
 				if (vars.tooltip.dimension) {
 					html += '<div class="dimension">' + vars.data2[d.ypos][0].qText + '</div>';
 				}
-				html += '<div class="measure">' + vars.measureTitle[i-1].qFallbackTitle + ' :' + vars.data2[d.ypos][i].qText + '</div>';
+				html += '<div class="measure">' + vars.measureTitle[i-1].qFallbackTitle + ': ' + vars.data2[d.ypos][i].qText + '</div>';
 
 				return html;
 			})
@@ -664,8 +664,10 @@ define([
 						xpos = 0;
 						return 0;
 					} else {
-						xpos += x(d.qNum); 
-						return xpos - x(d.qNum);
+						if (d.qNum !=="NaN") {
+							xpos += x(d.qNum); 
+							return xpos - x(d.qNum);
+						}
 					}
 				}
 			})
@@ -729,22 +731,25 @@ define([
 				}
 			})
 			.attr('x', function(d,i){
+				// console.log(d)
 				if (i==0) {
 					xpos = 0;
 				} else {
-					var xwidth = x(d.qNum);
-					var textWidth = this.getBBox().width;
-					if(i>0 && vars.stacked) {
-						xpos += xwidth; 
-						return xpos - xwidth + (xwidth/2) - (textWidth/2);
-					} else if (i>0 && vars.bar.grouped) {
-						if (textWidth+(vars.bar.padding*2) > xwidth) {
-							return xwidth + 5;
+					if (d.qNum !=="NaN") {
+						var xwidth = x(d.qNum);
+						var textWidth = this.getBBox().width;
+						if(i>0 && vars.stacked) {
+							xpos += xwidth; 
+							return xpos - xwidth + (xwidth/2) - (textWidth/2);
+						} else if (i>0 && vars.bar.grouped) {
+							if (textWidth+(vars.bar.padding*2) > xwidth) {
+								return xwidth + 5;
+							} else {
+								return (xwidth/2) - (textWidth/2);
+							}
 						} else {
-							return (xwidth/2) - (textWidth/2);
+							return xwidth + 5;
 						}
-					} else {
-						return xwidth + 5;
 					}
 				}
 			})
