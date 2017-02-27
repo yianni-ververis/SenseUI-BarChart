@@ -547,7 +547,7 @@ define([
 				if (vars.tooltip.dimension) {
 					html += '<div class="dimension">' + vars.data2[d.ypos][0].qText + '</div>';
 				}
-				html += '<div class="measure">' + vars.measureTitle[i-1].qFallbackTitle + ': ' + vars.data2[d.ypos][i].qText + '</div>';
+				html += '<div class="measure">' + vars.measureTitle[i-1].qFallbackTitle + ': ' + roundNumber(vars.data2[d.ypos][i].qText) + '</div>';
 
 				return html;
 			})
