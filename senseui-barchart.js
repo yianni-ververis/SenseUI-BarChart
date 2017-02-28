@@ -143,6 +143,13 @@ define([
 									defaultValue: "#404040",
 									ref: "vars.bar.borderColor"
 								},
+								barBorderColorHover: {
+									type: "string",
+									expression: "none",
+									label: "Border Hover Color",
+									defaultValue: "#77b62a",
+									ref: "vars.bar.borderColorHover"
+								},
 								barSpacing: {
 									type: "number",
 									expression: "none",
@@ -357,7 +364,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.5', // 2.0.0 - Added Grouped Bar Chart 
+			v: '2.0.6', // 2.0.0 - Added Grouped Bar Chart 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -378,6 +385,7 @@ define([
 				textColor: (layout.vars.bar.textColor)?layout.vars.bar.textColor.split(','):['#000000'],
 				textHoverColor: (layout.vars.bar.textHoverColor)?layout.vars.bar.textHoverColor.split(','):['#000000'],
 				borderColor: (layout.vars.bar.borderColor)?layout.vars.bar.borderColor:'#404040',
+				borderColorHover: (layout.vars.bar.borderColorHover)?layout.vars.bar.borderColorHover:'#77b62a',
 				lollipop: (!_.isUndefined(layout.vars.bar.lollipop) && layout.vars.bar.lollipop)?true:false,
 				grouped: (!_.isUndefined(layout.vars.bar.grouped) && layout.vars.bar.grouped)?true:false,
 				// grouped: (layout.qHyperCube.qSize.qcx > 2) ? true : false,
@@ -666,14 +674,11 @@ define([
 			})
 			.attr('width', function(d,i){
 				if (vars.bar.grouped) {
-						// console.log(i)
-						// console.log(d)
 					if(d.qNum!=='NaN' && i!=0) { // i=0 is the dimension legend
 						return x(d.qNum);
 					}
 				} else {
 					if(d.qNum!=='NaN') {
-						// console.log(d)
 						return x(d.qNum);
 					}
 				}
@@ -697,7 +702,6 @@ define([
 				if (vars.bar.grouped && !vars.stacked) {
 					if (i==0) { // Dimension / Label
 						ypos = y(d.ypos);
-						// return false;
 					} else if (i==vars.qcx-1) {
 						ypos += vars.bar.height + 20; 
 						return ypos -20;
@@ -714,6 +718,8 @@ define([
 			.attr("height", vars.bar.height)
 			.on('mouseover', function(d,i){
 				d3.select(this).style("fill", vars.bar.colorHover);
+				d3.select(this).style("stroke", vars.bar.borderColorHover);
+				d3.select(this).style("stroke-width", vars.bar.border);
 				if (vars.tooltip.visible) {
 					tip.show(d, i); 
 					setTimeout(function(){tip.hide();}, 10000);
@@ -722,6 +728,7 @@ define([
 			.on('mouseleave', function(d,i){
 				tip.hide(); 
 				d3.select(this).style("fill", vars.palette[i-1]);
+				d3.select(this).style("stroke", vars.bar.borderColor);
 			})
 			.on('click', function(d,i) {
 				tip.hide();
