@@ -61,8 +61,8 @@
           scrollTop = (window.pageYOffset !== undefined) ? window.pageYOffset : (document.documentElement || document.body.parentNode || document.body).scrollTop,
           scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
 
-        if (pextensionData.mashup && $(pextensionData.divid).length>0) {
-          scrollTop -= $('#maincontent').offset().top;
+        if (pextensionData.divid && $('#'+pextensionData.divid).length>0) {
+          scrollTop -= $('#'+pextensionData.divid).offset().top;
         }
 
       nodel.html(content)
