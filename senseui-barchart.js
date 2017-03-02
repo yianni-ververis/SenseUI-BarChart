@@ -640,8 +640,10 @@ define([
 			num = (vars.precision) ? parseFloat(num).toFixed(2) : Math.round(num);
 			if (num >= 1000 && num<1000000) {
 				num = (vars.precision) ? parseFloat(num/1000).toFixed(2)  + 'K' : Math.round(num/1000) + 'K';
-			} else if (num >= 1000000) {
+			} else if (num >= 1000000 && num<1000000000) {
 				num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
+			} else if (num >= 1000000000) {
+				num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'G' : Math.round(num/1000000000) + 'G';
 			}
 			return num;
 		}
