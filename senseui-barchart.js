@@ -72,13 +72,6 @@ define([
 									ref: "vars.fontSize"
 								},
 								precision: {
-									type: "integer",
-									expression: "none",
-									label: "Precision Digits",
-									defaultValue: 0,
-									ref: "vars.precision"
-								},
-								precision: {
 									type: "boolean",
 									component: "switch",
 									label: "Display decimals?",
