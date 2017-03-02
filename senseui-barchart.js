@@ -728,7 +728,7 @@ define([
 			.on('click', function(d,i) {
 				tip.hide();
 				if (vars.enableSelections) {
-					vars.this.backendApi.selectValues(0, [d.qElemNumber], false);
+					vars.this.backendApi.selectValues(0, [d.qElemNumber], true);
 				}
 			});
 
