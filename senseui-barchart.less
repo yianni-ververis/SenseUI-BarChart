@@ -1,0 +1,208 @@
+.senseui-barchart {
+	h2 {
+		font-size: 14px !important;
+		margin-top: 0 !important;
+	}
+	.axis {
+	font: 0.9em sans-serif;
+	}
+	.outer,
+	.content {
+		overflow-y: auto;
+		overflow-x: hidden;
+	}
+	#xaxis path {
+		fill: #cccccc;
+	}
+	#yaxis {
+		fill: none;
+	}
+	.bar {
+		fill: #4477AA;
+		&:hover {
+			cursor: pointer;
+			fill: #77b62a;
+		}
+	}
+	.legend {
+		.column {
+			display: inline-block;
+			.box {
+				width: 10px;
+				height: 10px;
+				margin-right: 10px;
+				display: inline-block;
+			}
+		}
+	}
+	/* QLIK */
+	.qv-object-nav {
+		cursor: pointer !important;
+	}
+	.qv-object .qv-object-title {
+		white-space: normal;
+	}
+}
+
+/* D3 TIP*/
+// .d3-tip {
+//   line-height: 1.5;
+//   font-weight: bold;
+//   padding: 12px;
+//   background: rgba(64,64,64,0.9) !important;
+//   color: black;
+//   border: 1px solid #404040; /* #404040 = 64,64,64 */
+//   border-radius: 2px;
+// }
+// /* Creates a small triangle extender for the tooltip */
+// .d3-tip:after {
+//   box-sizing: border-box;
+//   display: inline;
+//   font-size: 14px;
+//   width: 100%;
+//   line-height: 0;
+//   color: rgba(64,64,64,0.9);
+//   content: "\25BC";
+//   position: inherit;
+//   text-align: center;
+//   margin: 0;
+//   padding: 0;
+//   padding-top: 4px;
+// }
+
+// /* Style northward tooltips differently */
+// .d3-tip.n:after {
+//   margin: 0;
+//   /*margin: -3px 0 0 0;*/
+//   top: 100%;
+//   left: 0;
+// }
+// .d3-tip.n.left {
+//   -webkit-transform: translate(-40px, 0);
+//   transform: translate(-40px, 0);
+// }
+// .d3-tip.n.left:after {
+//   -webkit-transform: translate(40px, 0);
+//   transform: translate(40px, 0);
+// }
+// .d3-tip.n.leftBar {
+//   -webkit-transform: translate(-50px, 0);
+//   transform: translate(-50px, 0);
+// }
+// .d3-tip.n.leftBar:after {
+//   -webkit-transform: translate(50px, 0);
+//   transform: translate(50px, 0);
+// }
+// .d3-tip .dimension,
+// .d3-tip .measure {
+// 	display: block;
+// }
+
+// .d3-tip .dimension {
+// 	font-weight: bold;
+// }
+// .d3-tip .measure {
+// 	text-align: right;
+// }
+
+/* D3 TIP*/
+.d3-tip {
+	line-height: 1.5;
+	font-size: 11px;
+	padding: 8px;
+	background: white !important;
+	color: #666666;
+	border: 1px solid #CCCCCC; /* #404040 = 64,64,64 */
+	border-radius: 2px;
+	box-sizing: border-box;
+	background-color: rgba(64,64,64,0.9);
+	line-height: 1.5;
+	border-radius: 5px;
+	max-width: 350px;
+	-webkit-transition: opacity 1s; /* Safari */
+	transition: opacity 1s;
+	z-index: 1022; // 1021 is the .qv-tooltip
+	font-family: Arial, Helvetica, sans-serif !important;
+	-webkit-box-shadow: 0px 4px 7px -4px rgba(153,153,153,1);
+	-moz-box-shadow: 0px 4px 7px -4px rgba(153,153,153,1);
+	box-shadow: 0px 4px 7px -4px rgba(153,153,153,1);	
+	.dimension {	
+		font-weight: bold;
+		font-size: 14px;
+		display: block;
+	}
+	.measure {	
+		display: block;
+	}
+	.box {
+		width: 10px;
+		height: 10px;
+		display: inline-block;
+		margin-right: 5px;
+		border: 1px solid #CCCCCC;
+	}
+	&:after, 
+	&:before {
+		top: 100%;
+		left: 50%;
+		border: solid transparent;
+		content: " ";
+		height: 0;
+		width: 0;
+		position: absolute;
+		pointer-events: none;
+	}
+	&:after {
+		border-color: rgba(255, 255, 255, 0);
+		border-top-color: #ffffff;
+		border-width: 10px;
+		margin-left: -10px;
+	}
+	&:before {
+		border-color: rgba(153, 153, 153, 0);
+		border-top-color: #999999;
+		border-width: 11px;
+		margin-left: -11px;
+	}
+	.tt-container {
+		display: -webkit-flex;
+		display: flex;
+		flex: 1 0 0;
+		flex-flow: column wrap;
+		.tt-row {
+			display: -webkit-flex;
+			display: flex;
+			-webkit-flex-direction: row; 
+			flex-direction: row;
+			-webkit-justify-content: flex-start;
+			justify-content: flex-start;
+			.tt-item-header {
+				flex: 1 0 100%;
+				box-sizing: border-box;
+				background:white;
+				color: #666666;
+				padding-bottom: 5px;
+				// border-bottom: 1px solid #e8f1f6; 
+				font-size: 12px;
+				font-weight: bold;
+			}
+			.tt-item-label {
+				flex: 1 0 auto;
+				box-sizing: border-box;
+				background: white;
+				color: #666666;
+			}
+			.tt-item-value {
+				flex: 1 0 auto;
+				box-sizing: border-box;
+				background: white;
+				color: #333333;
+				text-align: right;
+				padding-left: 5px;
+			}
+			&:nth-child(2) {
+				padding-top: 5px;
+			}
+		}
+	}
+}

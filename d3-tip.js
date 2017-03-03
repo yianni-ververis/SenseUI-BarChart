@@ -266,17 +266,21 @@
         'position': 'absolute',
         'top': 0,
         'opacity': 0,
-        'pointer-events': 'none',
-        'box-sizing': 'border-box',
-        'background-color': 'rgba(64,64,64,0.9)',
-        'line-height': '1.5',
-        'padding': '8px',
-        'color': 'white',
-        'border-radius': '5px',
-        'max-width': '350px',
-        '-webkit-transition': 'opacity 1s', /* Safari */
-        'transition': 'opacity 1s',
-        'z-index': '1022', // 1021 is the .qv-tooltip
+        'pointer-events': 'none'
+        // 'position': 'absolute',
+        // 'top': 0,
+        // 'opacity': 0,
+        // 'pointer-events': 'none',
+        // 'box-sizing': 'border-box',
+        // 'background-color': 'rgba(64,64,64,0.9)',
+        // 'line-height': '1.5',
+        // 'padding': '8px',
+        // 'color': 'white',
+        // 'border-radius': '5px',
+        // 'max-width': '350px',
+        // '-webkit-transition': 'opacity 1s', /* Safari */
+        // 'transition': 'opacity 1s',
+        // 'z-index': '1022', // 1021 is the .qv-tooltip
       })
 
       return node.node()

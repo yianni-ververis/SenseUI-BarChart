@@ -6,6 +6,8 @@
  * @param {string} title - Initial text for the dropdown
  * @description
  * 
+ * @version 2.1.2: Changed Tooltip
+ * @version 2.1.1: Split files. Fixed Tooltip
  * @version 2.1.0: Added Horizontal Bar Chart 
  * @version 2.0.0: Added Grouped Bar Chart 
  */
@@ -15,349 +17,27 @@ define([
 	"jquery",
 	"qvangular",
 	'underscore',
+	'./senseui-barchart-options',
 	"css!./senseui-barchart.css",
 	"./d3.min",
 	'./d3-tip'
-], function(qlik, $, qvangular, _, cssContent, d3) {
+], function(qlik, $, qvangular, _, options, cssContent, d3) {
 'use strict';
 	// Define properties
-	var me = {
-		initialProperties: {
-			version: 1.2,
-			qHyperCubeDef: {
-				qDimensions: [],
-				qMeasures: [],
-				qInitialDataFetch: [{
-					qWidth: 6,
-					qHeight: 500
-				}]
-			}
-		},
-		definition: {
-			type: "items",
-			component: "accordion",
-			items: {
-				dimensions: {
-					uses: "dimensions",
-					min: 1,
-					max: 2
-				},
-				measures: {
-					uses: "measures",
-					min: 1,
-					max: 5
-				},
-				sorting: {
-					uses: "sorting"
-				},
-				settings : {
-					uses : "settings",
-					items: {
-						general: {
-							type: "items",
-							label: "General",
-							items: {
-								Color: {
-									type: "string",
-									expression: "none",
-									label: "Text color",
-									defaultValue: "#000000",
-									ref: "vars.color"
-								},
-								FontSize: {
-									type: "string",
-									expression: "none",
-									label: "Font Size",
-									defaultValue: "11",
-									ref: "vars.fontSize"
-								},
-								precision: {
-									type: "boolean",
-									component: "switch",
-									label: "Display decimals?",
-									ref: "vars.precision",
-									options: [{
-										value: true,
-										label: "Yes"
-									}, {
-										value: false,
-										label: "No"
-									}],
-									defaultValue: false
-								},
-							},
-						},
-						bar: {
-							type: "items",
-							label: "Bar",
-							items: {
-								barFillColor: {
-									type: "string",
-									expression: "none",
-									label: "Fill color Separated by comma if stacked bar. If Empty, use default Sense palette",
-									defaultValue: "#4477AA",
-									ref: "vars.bar.fillColor"
-								},
-								barFillHoverColor: {
-									type: "string",
-									expression: "none",
-									label: "Fill hover color",
-									defaultValue: "#77b62a",
-									ref: "vars.bar.fillHoverColor"
-								},
-								barTextColor: {
-									type: "string",
-									expression: "none",
-									label: "Text color",
-									defaultValue: "#000000",
-									ref: "vars.bar.textColor"
-								},
-								barTextHoverColor: {
-									type: "string",
-									expression: "none",
-									label: "Text hover color",
-									defaultValue: "#000000",
-									ref: "vars.bar.textHoverColor"
-								},
-								barBorderWeight: {
-									type: "number",
-									expression: "none",
-									label: "Border weight",
-									component: "slider",
-									ref: "vars.bar.borderWeight",
-									defaultValue: 0,
-									min: 0,
-									max: 3
-								},
-								barBorderColor: {
-									type: "string",
-									expression: "none",
-									label: "Border color",
-									defaultValue: "#404040",
-									ref: "vars.bar.borderColor"
-								},
-								barBorderColorHover: {
-									type: "string",
-									expression: "none",
-									label: "Border Hover Color",
-									defaultValue: "#77b62a",
-									ref: "vars.bar.borderColorHover"
-								},
-								barSpacing: {
-									type: "number",
-									expression: "none",
-									label: "Spacing",
-									component: "slider",
-									ref: "vars.bar.spacing",
-									defaultValue: 3,
-									min: 3,
-									max: 10
-								},
-								barHeight: {
-									type: "number",
-									expression: "none",
-									label: "Bar height",
-									defaultValue: 20,
-									ref: "vars.bar.height",
-								},
-								enableSelections: {
-									type: "boolean",
-									component: "switch",
-									label: "Enable Selections",
-									ref: "vars.enableSelections",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: true
-								},
-								lollipop: {
-									type: "boolean",
-									component: "switch",
-									label: "Lollipop View",
-									ref: "vars.bar.lollipop",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: false
-								},
-								grouped: {
-									type: "boolean",
-									component: "switch",
-									label: "Grouped View",
-									ref: "vars.bar.grouped",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: false,
-									show : function(data) {
-										if (data.qHyperCubeDef.qMeasures.length>1) {
-											return true;
-										}
-									}
-								}
-							},
-						},
-						tooltip: {
-							type: "items",
-							label: "Tooltip",
-							items: {
-								// @TODO add show function on all tolltip elements if visible is false
-								toolVisible: {
-									type: "boolean",
-									component: "switch",
-									label: "Show Tooltip?",
-									ref: "vars.tooltip.visible",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: true
-								},
-								dimension: {
-									type: "boolean",
-									component: "switch",
-									label: "Show Dimension?",
-									ref: "vars.tooltip.dimension",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: true
-								},
-								mashup: {
-									type: "boolean",
-									component: "switch",
-									label: "Will this be in a mashup?",
-									ref: "vars.tooltip.mashup",
-									options: [{
-										value: true,
-										label: "Yes"
-									}, {
-										value: false,
-										label: "No"
-									}],
-									defaultValue: false
-								},
-								mashupDiv: {
-									type: "string",
-									expression: "none",
-									label: "What is the mashup div id to calculate correct positioning",
-									defaultValue: "maincontent",
-									ref: "vars.tooltip.divid",
-									show : function(data) {
-										if (data.vars.tooltip && data.vars.tooltip.mashup) {
-											return true;
-										}
-									}
-								},
-							},
-						},
-						xaxis: {
-							type: "items",
-							label: "X axis",
-							items: {
-								xaxisVisible: {
-									type: "boolean",
-									component: "switch",
-									label: "Show X Axis?",
-									ref: "vars.xaxis.visible",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: false
-								},
-								legendVisible: {
-									type: "boolean",
-									component: "switch",
-									label: "Show Legend?",
-									ref: "vars.legend.visible",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: true
-								}
-							},
-						},
-						yaxis: {
-							type: "items",
-							label: "Y axis",
-							items: {
-								yaxisVisible: {
-									type: "boolean",
-									component: "switch",
-									label: "Show Y Axis?",
-									ref: "vars.yaxis.visible",
-									options: [{
-										value: true,
-										label: "On"
-									}, {
-										value: false,
-										label: "Off"
-									}],
-									defaultValue: true
-								},
-								yaxisWidth: {
-									type: "number",
-									expression: "none",
-									label: "Label width",
-									defaultValue: 150,
-									ref: "vars.yaxis.width",
-								},
-								yaxisCharacters: {
-									type: "number",
-									expression: "none",
-									label: "Number of visible characters",
-									defaultValue: 50,
-									ref: "vars.yaxis.characters",
-								},
-							},
-						},
-					}
-				}
-			}
-		}
-	};
+	var me = options;
 	
 	// Get Engine API app for Selections
 	me.app = qlik.currApp(this);
 	
-	me.snapshot = {
-		canTakeSnapshot : true
-	};
-
 	me.support = {
-		export: true
+		snapshot: true,
+		export: true,
+		exportData : false
 	};
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.0.6', // 2.0.0 - Added Grouped Bar Chart 
+			v: '2.1.2', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix,
 			data2: layout.qHyperCube.qDataPages[0].qMatrix,
@@ -462,8 +142,18 @@ define([
 		});
 		
 		// CSS
-		$( '#' + vars.id ).css( "color", vars.color );
-
+		vars.css.content = `
+			#${vars.id} {
+				color: ${vars.color}
+			}
+			.${vars.id}.d3-tip .box.measure1 {
+				background-color: ${vars.bar.color}
+			}
+		`;
+		
+		if (!$(`.${vars.id}.d3-tip`).length) { // insert only once
+			$("<style>").html(vars.css.content).appendTo("head")
+		}
 		if (document.getElementById(vars.id)) {
 			$element.empty();
 		}
@@ -535,20 +225,29 @@ define([
 				.append('svg')
 				.attr({'width':vars.width,'height':vars.footer.height});
 		}
-		// Draw the tooltip
-		if ($('.' + vars.id + ' .d3-tip').length > 0) {
-			$('.' + vars.id + ' .d3-tip ').remove();
+		// TOOLTIPS
+		if ($(`.${vars.id}.d3-tip`).length > 0) {
+			$(`.${vars.id}.d3-tip`).remove();
 		}
-		var tip = d3.tip()
-			.attr('class', vars.id + ' d3-tip')
+		let tip = d3.tip()
+			.attr('class', `${vars.id} d3-tip`)
 			.offset([-10, 0]) 
 			.extensionData(vars.tooltip)
 			.html(function(d,i) {
-				var html = '';
+				// Flex
+				let html = `
+					<div class="tt-container">
+				`;
 				if (vars.tooltip.dimension) {
-					html += '<div class="dimension">' + vars.data2[d.ypos][0].qText + '</div>';
+					html += `<div class="tt-row"><div class="tt-item-header">${vars.data2[d.ypos][0].qText}</div></div>`;
 				}
-				html += '<div class="measure">' + vars.measureTitle[i-1].qFallbackTitle + ': ' + roundNumber(vars.data2[d.ypos][i].qText) + '</div>';
+				html += `
+						<div class="tt-row">
+							<div class="tt-item-label"><div class="box measure1"></div>${vars.measureTitle[i-1].qFallbackTitle}:</div>
+							<div class="tt-item-value">${roundNumber(vars.data2[d.ypos][i].qText)}</div>
+						</div>
+					</div>
+				`;
 
 				return html;
 			})
