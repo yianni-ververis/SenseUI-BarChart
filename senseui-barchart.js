@@ -78,7 +78,7 @@ define([
 				visible: (layout.vars.tooltip && layout.vars.tooltip.visible)?true:false,
 				dimension: (layout.vars.tooltip && layout.vars.tooltip.dimension)?true:false,
 				mashup: (layout.vars.tooltip && layout.vars.tooltip.mashup)?true:false,
-				divid: (layout.vars.tooltip && layout.vars.tooltip.divid)? layout.vars.tooltip.divid : '#maincontent',
+				divid: (layout.vars.tooltip && layout.vars.tooltip.divid)? layout.vars.tooltip.divid : 'maincontent',
 			},
 			canvasHeight: null,
 			// legendHeight: 50,
@@ -157,7 +157,7 @@ define([
 		if (document.getElementById(vars.id)) {
 			$element.empty();
 		}
-
+		
 		// Check the height of the combines rects
 		var calculatedHeight = vars.data2.length * (vars.bar.height + vars.bar.padding);
 		
@@ -329,13 +329,16 @@ define([
 
 		// helper Function to round the displayed numbers
 		let roundNumber = (num) => {
-			num = (vars.precision) ? parseFloat(num).toFixed(2) : Math.round(num);
-			if (num >= 1000 && num<1000000) {
-				num = (vars.precision) ? parseFloat(num/1000).toFixed(2)  + 'K' : Math.round(num/1000) + 'K';
-			} else if (num >= 1000000 && num<1000000000) {
-				num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
-			} else if (num >= 1000000000) {
-				num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'G' : Math.round(num/1000000000) + 'G';
+			//check if the string passed is number or contains formatting like 13%
+			if (/^[0-9.]+$/.test(num)) {
+				num = (vars.precision) ? parseFloat(num).toFixed(2) : Math.round(num);
+				if (num >= 1000 && num<1000000) {
+					num = (vars.precision) ? parseFloat(num/1000).toFixed(2)  + 'K' : Math.round(num/1000) + 'K';
+				} else if (num >= 1000000 && num<1000000000) {
+					num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
+				} else if (num >= 1000000000) {
+					num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'G' : Math.round(num/1000000000) + 'G';
+				}
 			}
 			return num;
 		}
