@@ -337,7 +337,7 @@ define([
 				} else if (num >= 1000000 && num<1000000000) {
 					num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
 				} else if (num >= 1000000000) {
-					num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'G' : Math.round(num/1000000000) + 'G';
+					num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'T' : Math.round(num/1000000000) + 'T';
 				}
 			}
 			return num;
