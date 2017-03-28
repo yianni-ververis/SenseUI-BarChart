@@ -39,8 +39,8 @@ define([
 		var vars = {
 			v: '2.1.2', 
 			id: layout.qInfo.qId,
-			data: layout.qHyperCube.qDataPages[0].qMatrix,
-			data2: layout.qHyperCube.qDataPages[0].qMatrix,
+			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
+			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			height: $element.height(),
 			width: $element.width(),
 			qcx: layout.qHyperCube.qSize.qcx,
@@ -125,13 +125,7 @@ define([
 			vars.template += '<div class="footer"></div>';
 		};
 		vars.template += '</div>';
-		// Adjust label width based on the parent window
-		// if (vars.width <= 200 && vars.label.visible) {
-		// 	vars.label.width = 50;
-		// } else if (vars.width <= 300 && vars.label.visible) {
-		// 	vars.label.width = 80;
-		// }	
-
+		
 		vars.data = vars.data.map(function(d) {
 			return {
 				"dimension":d[0].qText,
