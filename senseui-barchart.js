@@ -19,8 +19,8 @@ define([
 	'underscore',
 	'./senseui-barchart-options',
 	"css!./senseui-barchart.css",
-	"./d3.min",
-	'./d3-tip'
+	"./lib/d3.v4.min",
+	// './d3-tip'
 ], function(qlik, $, qvangular, _, options, cssContent, d3) {
 'use strict';
 	// Define properties
@@ -119,7 +119,7 @@ define([
 
 		vars.template = '\
 			<div qv-extension class="ng-scope senseui-barchart" id="' + vars.id + '">\
-				<div class="content"></div>\
+				<div class="content"><svg></svg></div>\
 		';
 		if (vars.footer.visible) {
 			vars.template += '<div class="footer"></div>';
@@ -202,17 +202,26 @@ define([
 			vars.canvasHeight = vars.data2.length * (vars.bar.height+(vars.bar.padding*2)+3);
 		// }
 
-		var x = d3.scale.linear()
+// console.log(1)
+// // console.log( vars.id)
+// console.log($('#GDfJrx .content'))
+// console.log(d3.select('#GDfJrx .content'))
+
+		var x = d3.scaleLinear()
 			.domain([0,dMax2])
 			.range([0, (vars.label.visible)?vars.width-vars.label.width-55:vars.width]);
 
-		var y = d3.scale.linear()
+		var y = d3.scaleLinear()
 			.domain([0, (!vars.stacked) ? vars.data2.length/(vars.qcx-1) : vars.data2.length])
 			.range([10,vars.canvasHeight]);
 
-		var svg = d3.select('#' + vars.id + ' .content')
-			.append('svg')
-			.attr({'width':vars.width,'height':(vars.bar.grouped && !vars.stacked)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight});
+		var svg = d3.select('#'+vars.id+' .content').append('svg');
+		svg.attr("width", vars.width);
+		svg.attr("height", (vars.bar.grouped && !vars.stacked)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight);
+			// .append('svg')
+			// .attr({'width':vars.width,'height':(vars.bar.grouped && !vars.stacked)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight});
+// console.log(svg)
+// console.log(2)
 
 		if (vars.footer.visible) {
 			var svgFooter = d3.select('#' + vars.id + ' .footer')
@@ -224,58 +233,66 @@ define([
 			$(`.${vars.id}.d3-tip`).remove();
 		}
 
-		var tip = d3.tip()
-			.attr('class', `${vars.id} d3-tip`)
-			.offset([-10, 0]) 
-			.extensionData(vars.tooltip)
-			.html(function(d,i) {
-				// Flex
-				let html = `
-					<div class="tt-container">
-				`;
-				if (vars.tooltip.dimension) {
-					html += `<div class="tt-row"><div class="tt-item-header">${vars.data2[d.ypos][0].qText}</div></div>`;
-				}
-				html += `
-						<div class="tt-row">
-							<div class="tt-item-label"><div class="box measure1"></div>${vars.measureTitle[i-1].qFallbackTitle}:</div>
-							<div class="tt-item-value">${roundNumber(vars.data2[d.ypos][i].qText)}</div>
-						</div>
-					</div>
-				`;
+		// var tip = d3.tip()
+		// 	.attr('class', `${vars.id} d3-tip`)
+		// 	.offset([-10, 0]) 
+		// 	.extensionData(vars.tooltip)
+		// 	.html(function(d,i) {
+		// 		// Flex
+		// 		let html = `
+		// 			<div class="tt-container">
+		// 		`;
+		// 		if (vars.tooltip.dimension) {
+		// 			html += `<div class="tt-row"><div class="tt-item-header">${vars.data2[d.ypos][0].qText}</div></div>`;
+		// 		}
+		// 		html += `
+		// 				<div class="tt-row">
+		// 					<div class="tt-item-label"><div class="box measure1"></div>${vars.measureTitle[i-1].qFallbackTitle}:</div>
+		// 					<div class="tt-item-value">${roundNumber(vars.data2[d.ypos][i].qText)}</div>
+		// 				</div>
+		// 			</div>
+		// 		`;
 
-				return html;
-			})
+		// 		return html;
+		// 	})
 
-		svg.call(tip);
+		// svg.call(tip);
 
-		var	xAxis = d3.svg.axis()
-			.scale(x)
-			.orient('bottom');
+		// var	xAxis = d3.svg.axis()
+		// 	.scale(x)
+		// 	.orient('bottom');
+		var	xAxis = d3.axisBottom(x);
 
-		var	yAxis = d3.svg.axis()
-			.scale(y)
-			.orient('left')
-			// .tickSize(2)
+		// var	yAxis = d3.svg.axis()
+		// 	.scale(y)
+		// 	.orient('left')
+		// 	// .tickSize(2)
+		// 	.tickFormat(function(d,i){
+		// 		return vars.data2[i][0].qText; 
+		// 	})
+		// 	.tickValues(d3.range(vars.data2.length)); 
+		var	yAxis = d3.axisLeft(y)
 			.tickFormat(function(d,i){
 				return vars.data2[i][0].qText; 
 			})
-			.tickValues(d3.range(vars.data2.length)); //1167
-
+			.tickValues(d3.range(vars.data2.length)); 
+			
 		// Y Axis labels
 	 	if (vars.label.visible){
+console.log(vars.label)
 			var y_xis = svg.append('g')
 				.attr("transform", "translate("+vars.label.width+", -10)")
 				.attr('id','yaxis')
 				.attr('width', vars.label.width-10)
 			y_xis.call(yAxis) //layout.qHyperCube.qSize.qcx 
 				.selectAll("text")  
-					.style("text-anchor", "start")
-					.attr("x", "-"+vars.label.width)
-					.attr("y", (vars.bar.grouped) ? (vars.bar.height*vars.qcx)/2 : vars.label.padding) // SOLUTION 1 
-					.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
-					// .attr("dominant-baseline", "central")
-					.call(wrap, vars.label.width);
+				.style("text-anchor", "start")
+				// .attr("x", "-"+vars.label.width)
+				.attr("x", 0)
+				.attr("y", (vars.bar.grouped) ? (vars.bar.height*vars.qcx)/2 : vars.label.padding) // SOLUTION 1 
+				.attr('style', 'fill:' + vars.color + '; font-size:' + vars.fontSize + ';')
+				// .attr("dominant-baseline", "central")
+				// .call(wrap, vars.label.width);
 		}
 
 		// X Axis labels
@@ -292,6 +309,7 @@ define([
 		
 		// Wrap the text labels into the bounding box
 		function wrap(text, width) {
+			// console.log(text)
 			text.each(function() {
 				var text = d3.select(this),
 				words = text.text().split(/\s+/).reverse(),
@@ -310,11 +328,13 @@ define([
 						line.pop();
 						tspan.text(line.join(" "));
 						line = [word];
-						tspan = text.append("tspan").attr("x", -vars.label.width).attr("y", y).attr("dy", lineNumber * lineHeight + dy + "em").text(word);
+						// tspan = text.append("tspan").attr("x", -vars.label.width).attr("y", y).attr("dy", lineNumber * lineHeight + dy + "em").text(word);
+						tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", lineNumber * lineHeight + dy + "em").text(word);
 					}
 				}
 				// Align label at the middle of the bar
-				var textHeight = text[0][0].getBBox().height;
+				// console.log(text._groups[0][0])
+				var textHeight = text._groups[0][0].getBBox().height;
 				var textY = (vars.bar.height>textHeight) ? parseInt(y) + (vars.bar.height/2) - (textHeight/2) : parseInt(y);
 				$(this).find("tspan").each(function() {
 					$(this).attr('y',textY);
