@@ -17,10 +17,10 @@ define([
 	"jquery",
 	"qvangular",
 	'underscore',
-	'./senseui-barchart-options',
+	'./lib/senseui-barchart-options',
 	"css!./senseui-barchart.css",
-	"./d3.min",
-	'./d3-tip'
+	"./lib/d3.min",
+	'./lib/d3-tip'
 ], function(qlik, $, qvangular, _, options, cssContent, d3) {
 'use strict';
 	// Define properties
