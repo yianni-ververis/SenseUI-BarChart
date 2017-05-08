@@ -223,7 +223,8 @@ define([
 		if ($(`.${vars.id}.d3-tip`).length > 0) {
 			$(`.${vars.id}.d3-tip`).remove();
 		}
-		let tip = d3.tip()
+
+		var tip = d3.tip()
 			.attr('class', `${vars.id} d3-tip`)
 			.offset([-10, 0]) 
 			.extensionData(vars.tooltip)
@@ -411,7 +412,7 @@ define([
 				d3.select(this).style("fill", vars.bar.colorHover);
 				d3.select(this).style("stroke", vars.bar.borderColorHover);
 				d3.select(this).style("stroke-width", vars.bar.border);
-				if (vars.tooltip.visible) {
+				if (vars.tooltip.visible) {					
 					tip.show(d, i); 
 					setTimeout(function(){tip.hide();}, 10000);
 				}
