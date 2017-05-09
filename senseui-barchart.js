@@ -37,7 +37,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.1.2', 
+			v: '2.1.3', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -96,8 +96,16 @@ define([
 			verticalGridLines: null,
 			enableSelections: (layout.vars.enableSelections)? true : false,
 			palette: (layout.vars.bar.fillColor)? layout.vars.bar.fillColor.split(',') : ['#332288','#88CCEE','#117733','#DDCC77','#CC6677','#3399CC','#CC6666','#99CC66','#275378','#B35A01','#B974FD','#993300','#99CCCC','#669933','#898989','#EDA1A1','#C6E2A9','#D4B881','#137D77','#D7C2EC','#FF5500','#15DFDF','#93A77E','#CB5090','#BFBFBF'],
+			limit: (layout.vars.limit) ? parseInt(layout.vars.limit) : 0,
 			this: this
 		};
+
+		// Limit results
+		if (vars.limit) {
+			vars.data = vars.data2 = vars.data.filter(function(element, index) {
+				return index < vars.limit;
+			})
+		}
 				
 		vars.verticalGridLines = Math.round((vars.width-vars.label.width)/vars.verticalGridSpace);
 		// For old uses of the extension
@@ -126,12 +134,15 @@ define([
 		};
 		vars.template += '</div>';
 		
-		vars.data = vars.data.map(function(d) {
+		// @@ Trying to limit bar generation
+		// var totalBarstoShow = (vars.limit) ? vars.limit : vars.data2.length;
+		// var totalBarstoShow = vars.data2.length;
+		vars.data = vars.data.map(function(value, index) {
 			return {
-				"dimension":d[0].qText,
-				"measure":d[1].qText,
-				"measureNum":d[1].qNum,
-				"qElemNumber":d[0].qElemNumber,
+				"dimension": value[0].qText,
+				"measure": value[1].qText,
+				"measureNum": value[1].qNum,
+				"qElemNumber": value[0].qElemNumber,
 			}
 		});
 		
@@ -174,6 +185,7 @@ define([
 		// Get the first measure for max for now
 
 		// Loop through results
+console.log(vars)
 		var tempYpos = 0;
 		for (var i = 0; i < vars.data2.length; i++) {
 			vars.data2[i].total = 0;
