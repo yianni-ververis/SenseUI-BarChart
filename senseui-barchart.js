@@ -17,7 +17,7 @@ define([
 	"jquery",
 	"qvangular",
 	'underscore',
-	'./senseui-barchart-options',
+	'./lib/senseui-barchart-options',
 	"css!./senseui-barchart.css",
 	"./lib/d3.v4.min",
 	// './d3-tip'
@@ -37,7 +37,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.1.2', 
+			v: '3.0.1', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
