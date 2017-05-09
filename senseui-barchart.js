@@ -134,9 +134,6 @@ define([
 		};
 		vars.template += '</div>';
 		
-		// @@ Trying to limit bar generation
-		// var totalBarstoShow = (vars.limit) ? vars.limit : vars.data2.length;
-		// var totalBarstoShow = vars.data2.length;
 		vars.data = vars.data.map(function(value, index) {
 			return {
 				"dimension": value[0].qText,
@@ -181,11 +178,10 @@ define([
 			$('#' + vars.id + ' .content').height(vars.height);
 		}
 
-		var dMax = d3.max(vars.data, function(d) { return d.measureNum; });
 		// Get the first measure for max for now
+		var dMax = d3.max(vars.data, function(d) { return d.measureNum; });
 
 		// Loop through results
-console.log(vars)
 		var tempYpos = 0;
 		for (var i = 0; i < vars.data2.length; i++) {
 			vars.data2[i].total = 0;
@@ -216,7 +212,7 @@ console.log(vars)
 
 		var x = d3.scale.linear()
 			.domain([0,dMax2])
-			.range([0, (vars.label.visible)?vars.width-vars.label.width-55:vars.width]);
+			.range([0, (vars.label.visible)?vars.width-vars.label.width-100:vars.width]);
 
 		var y = d3.scale.linear()
 			.domain([0, (!vars.stacked) ? vars.data2.length/(vars.qcx-1) : vars.data2.length])
