@@ -37,7 +37,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '2.1.3', 
+			v: '2.1.4', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -238,25 +238,48 @@ define([
 			.extensionData(vars.tooltip)
 			.html(function(d,i) {
 				// Flex
-				let html = `
+				var html = `
 					<div class="tt-container">
 				`;
 				if (vars.tooltip.dimension) {
-					html += `<div class="tt-row"><div class="tt-item-header">${vars.data2[d.ypos][0].qText}</div></div>`;
+					html += '<div class="tt-row"><div class="tt-item-header">'+vars.data2[d.ypos][0].qText+'</div></div>';
 				}
-				html += `
-						<div class="tt-row">
-							<div class="tt-item-label"><div class="box measure1"></div>${vars.measureTitle[i-1].qFallbackTitle}:</div>
-							<div class="tt-item-value">${roundNumber(vars.data2[d.ypos][i].qText)}</div>
-						</div>
-					</div>
-				`;
+				html += ' \
+						<div class="tt-row"> \
+							<div class="tt-item-label"><div class="box measure1"></div>'+vars.measureTitle[i-1].qFallbackTitle+':</div> \
+							<div class="tt-item-value">'+roundNumber(vars.data2[d.ypos][i].qText)+'</div> \
+						</div> \
+					</div> \
+				';
 
 				return html;
 			})
 
 		svg.call(tip);
 
+		// helper Function to round the displayed numbers
+		var roundNumber = function (num, noPrecision) {
+			//check if the string passed is number or contains formatting like 13%
+			if (/^[0-9.]+$/.test(num)) {
+				num = (vars.precision && !noPrecision) ? parseFloat(num).toFixed(2) : Math.round(num);
+				if (num >= 1000 && num<1000000) {
+					num = (vars.precision && !noPrecision) ? parseFloat(num/1000).toFixed(2) : Math.round(num/1000);
+					num = num.replace(/\.00$/,''); // Remove .00
+					num += 'K'; // Add the abbreviation
+				} else if (num >= 1000000 && num<1000000000) {
+					num = (vars.precision && !noPrecision) ? parseFloat(num/1000000).toFixed(2) : Math.round(num/1000000);
+					num = num.replace(/\.00$/,''); // Remove .00
+					num += 'M'; // Add the abbreviation
+				} else if (num >= 1000000000) {
+					num = (vars.precision && !noPrecision) ? parseFloat(num/1000000000).toFixed(2) : Math.round(num/1000000000);
+					num = num.replace(/\.00$/,''); // Remove .00
+					num += 'T'; // Add the abbreviation
+				}
+			}
+			return num;
+		}
+
+		// Creation of the Chart
 		var	xAxis = d3.svg.axis()
 			.scale(x)
 			.orient('bottom');
@@ -295,9 +318,12 @@ define([
 				.call(xAxis
 					.tickSize(1)
 			    	.ticks(vars.verticalGridLines)
+					.tickFormat(function(d){
+						return roundNumber(d)
+					})
 			    );
 		}
-		
+		console.log(vars)
 		// Wrap the text labels into the bounding box
 		function wrap(text, width) {
 			text.each(function() {
@@ -328,22 +354,6 @@ define([
 					$(this).attr('y',textY);
 				})
 			});
-		}
-
-		// helper Function to round the displayed numbers
-		let roundNumber = (num) => {
-			//check if the string passed is number or contains formatting like 13%
-			if (/^[0-9.]+$/.test(num)) {
-				num = (vars.precision) ? parseFloat(num).toFixed(2) : Math.round(num);
-				if (num >= 1000 && num<1000000) {
-					num = (vars.precision) ? parseFloat(num/1000).toFixed(2)  + 'K' : Math.round(num/1000) + 'K';
-				} else if (num >= 1000000 && num<1000000000) {
-					num = (vars.precision) ? parseFloat(num/1000000).toFixed(2)  + 'M' : Math.round(num/1000000) + 'M';
-				} else if (num >= 1000000000) {
-					num = (vars.precision) ? parseFloat(num/1000000000).toFixed(2)  + 'T' : Math.round(num/1000000000) + 'T';
-				}
-			}
-			return num;
 		}
 
 		// Position Indexes
@@ -516,7 +526,6 @@ define([
 					} else {
 						style += ' fill: ' + vars.bar.textHoverColor[0]  + ';';
 					}
-					// style += (x(d.qNum)>20) ? 'fill: ' + vars.bar.textHoverColor[0]  + ';': 'fill: ' +  vars.color + ';';
 				}
 				return style;
 			})
@@ -558,8 +567,6 @@ define([
 			$('#' + vars.id + ' .content').append(legend);	
 		}
 
-		// Add grid lines
-
 		// Add the legend line
 		svg.append("line")
 			.attr('x1',vars.label.width)
@@ -574,11 +581,6 @@ define([
 
 		return qlik.Promise.resolve();
 	};
-
-	// Controller for binding
-	// me.controller =['$scope', '$rootScope', function($scope, $rootScope){}];
-
-	// me.template = template;
 
 	return me;
 });
