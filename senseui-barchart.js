@@ -6,6 +6,7 @@
  * @param {string} title - Initial text for the dropdown
  * @description
  * 
+ * @version 3.0.2: Added special symbols
  * @version 3.0.1: Increase speed with d3 v4
  * @version 2.1.3: Limit Results
  * @version 2.1.2: Changed Tooltip
@@ -38,8 +39,9 @@ define([
 	};
 
 	me.paint = function($element,layout) {
+		console.log(layout)
 		var vars = {
-			v: '3.0.1', 
+			v: '3.0.2', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -81,6 +83,10 @@ define([
 				divid: (layout.vars.tooltip && layout.vars.tooltip.divid)? layout.vars.tooltip.divid : 'maincontent',
 				scrollLeft: 0,
 				scrollTop: 0,
+			},
+			symbol: {
+				visible: (layout.vars.symbol && layout.vars.symbol.visible)?true:false,
+				char: (layout.vars.symbol && layout.vars.symbol.char)? layout.vars.symbol.char : null,
 			},
 			canvasHeight: null,
 			css: {
