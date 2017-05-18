@@ -40,7 +40,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '3.0.2', 
+			v: '3.0.3', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -68,6 +68,7 @@ define([
 				visible: layout.vars.yaxis.visible,
 				width: (layout.vars.yaxis.width) ? layout.vars.yaxis.width:150,
 				characters: (layout.vars.yaxis.characters) ? layout.vars.yaxis.characters:50,
+				rightPadding: (layout.vars.yaxis.rightPadding) ? layout.vars.yaxis.rightPadding:50,
 				padding: 15,
 				minWidth: 150
 			},
@@ -105,7 +106,7 @@ define([
 			limit: (layout.vars.limit) ? parseInt(layout.vars.limit) : 0,
 			this: this
 		};
-		
+console.log(vars)		
 		// Limit results
 		if (vars.limit) {
 			vars.data = vars.data2 = vars.data.filter(function(element, index) {
@@ -214,7 +215,7 @@ define([
 
 		var x = d3.scaleLinear()
 			.domain([0,dMax2])
-			.range([0, (vars.label.visible)?vars.width-vars.label.width-60:vars.width]);
+			.range([0, (vars.label.visible)?vars.width-vars.label.width-vars.label.rightPadding:vars.width]);
 
 		var y = d3.scaleLinear()
 			.domain([0, (!vars.stacked) ? vars.data2.length/(vars.qcx-1) : vars.data2.length])
