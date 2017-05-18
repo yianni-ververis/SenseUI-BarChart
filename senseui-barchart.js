@@ -39,7 +39,6 @@ define([
 	};
 
 	me.paint = function($element,layout) {
-		console.log(layout)
 		var vars = {
 			v: '3.0.2', 
 			id: layout.qInfo.qId,
