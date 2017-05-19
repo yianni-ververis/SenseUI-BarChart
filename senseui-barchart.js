@@ -106,7 +106,7 @@ define([
 			limit: (layout.vars.limit) ? parseInt(layout.vars.limit) : 0,
 			this: this
 		};
-console.log(vars)		
+		
 		// Limit results
 		if (vars.limit) {
 			vars.data = vars.data2 = vars.data.filter(function(element, index) {
@@ -444,7 +444,6 @@ console.log(vars)
 					if (i==0) { // Dimension / Label
 						yposText = y(d.ypos)+(vars.bar.height/2)+4;
 					} else if (i==vars.qcx-1) {
-						console.log(vars.bar.padding);
 						yposText += vars.bar.height + (vars.bar.height/2); 
 						return yposText - (vars.bar.height/2);
 					} else {
