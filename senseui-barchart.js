@@ -104,6 +104,7 @@ define([
 			enableSelections: (layout.vars.enableSelections)? true : false,
 			palette: (layout.vars.bar.fillColor)? layout.vars.bar.fillColor.split(',') : ['#332288','#88CCEE','#117733','#DDCC77','#CC6677','#3399CC','#CC6666','#99CC66','#275378','#B35A01','#B974FD','#993300','#99CCCC','#669933','#898989','#EDA1A1','#C6E2A9','#D4B881','#137D77','#D7C2EC','#FF5500','#15DFDF','#93A77E','#CB5090','#BFBFBF'],
 			limit: (layout.vars.limit) ? parseInt(layout.vars.limit) : 0,
+			noData: (layout.vars.noData) ? layout.vars.noData : "No Data Available",
 			this: this
 		};
 		
@@ -150,14 +151,11 @@ define([
 				"qElemNumber": value[0].qElemNumber,
 			}
 		});
-		
+				
 		// Add CSS
 		vars.css.content = ' \
 			#'+vars.id+' { \
 				color: '+vars.color+' \
-			} \
-			.'+vars.id+'.d3-tip .box.measure1 { \
-				background-color: '+vars.bar.color+' \
 			} \
 		';
 		
@@ -211,7 +209,7 @@ define([
 		}
 		var dMax2 = d3.max(vars.data2, function(d) { return d.total; });
 
-		vars.canvasHeight = vars.data2.length * (vars.bar.height+(vars.bar.padding*2)+3);
+		vars.canvasHeight = (vars.data2.length) ? vars.data2.length * (vars.bar.height+(vars.bar.padding*2)+3) : 20;
 
 		var x = d3.scaleLinear()
 			.domain([0,dMax2])
@@ -220,10 +218,10 @@ define([
 		var y = d3.scaleLinear()
 			.domain([0, (!vars.stacked) ? vars.data2.length/(vars.qcx-1) : vars.data2.length])
 			.range([10,vars.canvasHeight]);
-
+		
 		var svg = d3.select('#'+vars.id+' .content').append('svg');
 		svg.attr("width", vars.width);
-		svg.attr("height", (vars.bar.grouped && !vars.stacked)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight);
+		svg.attr("height", (vars.bar.grouped && !vars.stacked && vars.data.length)?vars.canvasHeight*(vars.qcx-1):vars.canvasHeight);
 
 		if (vars.footer.visible) {			
 			var svgFooter = d3.select('#' + vars.id + ' .footer').append('svg');
@@ -246,7 +244,7 @@ define([
 			}
 			html += ' \
 					<div class="tt-row"> \
-						<div class="tt-item-label"><div class="box measure1"></div>'+vars.measureTitle[i-1].qFallbackTitle+':</div> \
+						<div class="tt-item-label"><div class="box" style="background-color: '+vars.bar.color+'"></div>'+vars.measureTitle[i-1].qFallbackTitle+':</div> \
 						<div class="tt-item-value">'+roundNumber(vars, vars.data2[d.ypos][i].qText)+'</div> \
 					</div> \
 				</div> \
@@ -265,7 +263,7 @@ define([
 			.tickValues(d3.range(vars.data2.length)); 
 			
 		// Y Axis labels
-	 	if (vars.label.visible){
+	 	if (vars.label.visible && vars.data2.length){
 			var y_xis = svg.append('g')
 				.attr("transform", "translate("+vars.label.width+", -10)")
 				.attr('id','yaxis')
@@ -298,6 +296,15 @@ define([
 		var xpos = 0;
 		var ypos = 0;
 		var yposText = 0;
+
+		if (!vars.data.length) {
+			svg.append('g').append('text')
+				.attr("x", 0)             
+				.attr("y", 20)
+				.attr("text-anchor", "start")  
+				.style("font-size", "12px")  
+				.text(vars.noData)
+		}
 
 		//Create the Bars
 		var bars2 = svg.selectAll(".content")
@@ -514,14 +521,16 @@ define([
 		}
 
 		// Add the legend line
-		svg.append("line")
-			.attr('x1',vars.label.width)
-			.attr('x2',vars.label.width)
-			.attr("y1", 0)
-			.attr("y2", vars.canvasHeight)
-			.attr("stroke-width", 1)
-			.attr("shape-rendering", "crispEdges")
-			.attr("stroke", '#CCCCCC');
+		if (vars.data2.length) {
+			svg.append("line")
+				.attr('x1',vars.label.width)
+				.attr('x2',vars.label.width)
+				.attr("y1", 0)
+				.attr("y2", vars.canvasHeight)
+				.attr("stroke-width", 1)
+				.attr("shape-rendering", "crispEdges")
+				.attr("stroke", '#CCCCCC');
+		}
 
 		console.info(`%c SenseUI-BarChart ${vars.v}: `, 'color: red', `#${vars.id} Loaded!`);
 
