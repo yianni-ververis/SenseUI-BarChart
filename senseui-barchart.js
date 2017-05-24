@@ -87,6 +87,8 @@ define([
 			symbol: {
 				visible: (layout.vars.symbol && layout.vars.symbol.visible)?true:false,
 				char: (layout.vars.symbol && layout.vars.symbol.char)? layout.vars.symbol.char : null,
+				other: (layout.vars.symbol && layout.vars.symbol.other)? layout.vars.symbol.other : null,
+				otherPosition: (layout.vars.symbol && layout.vars.symbol.otherPosition)? layout.vars.symbol.otherPosition : false,
 			},
 			canvasHeight: null,
 			css: {
@@ -107,7 +109,7 @@ define([
 			noData: (layout.vars.noData) ? layout.vars.noData : "No Data Available",
 			this: this
 		};
-		
+			
 		// Limit results
 		if (vars.limit) {
 			vars.data = vars.data2 = vars.data.filter(function(element, index) {
