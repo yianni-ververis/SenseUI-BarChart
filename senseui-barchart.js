@@ -40,7 +40,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '3.0.3', 
+			v: '3.0.4', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -70,7 +70,7 @@ define([
 				characters: (layout.vars.yaxis.characters) ? layout.vars.yaxis.characters:50,
 				rightPadding: (layout.vars.yaxis.rightPadding) ? layout.vars.yaxis.rightPadding:50,
 				padding: 15,
-				minWidth: 150
+				minWidth: 50
 			},
 			footer: {
 				visible: layout.vars.xaxis.visible,
@@ -109,7 +109,7 @@ define([
 			noData: (layout.vars.noData) ? layout.vars.noData : "No Data Available",
 			this: this
 		};
-			
+				
 		// Limit results
 		if (vars.limit) {
 			vars.data = vars.data2 = vars.data.filter(function(element, index) {
@@ -237,6 +237,11 @@ define([
 
 		var tooltip = d3.select("body").append("div").attr("class", vars.id + " d3-tip");
 		var tooltipHtml = function (d,i) {
+			var bgColor = vars.bar.color;
+			if (bgColor.indexOf(',') != -1) { // Its an array of colors for stack bar
+				bgColor = bgColor.split(',');
+				bgColor = bgColor[d.xpos-1]
+			}
 			// Flex
 			var html = `
 				<div class="tt-container">
@@ -246,7 +251,7 @@ define([
 			}
 			html += ' \
 					<div class="tt-row"> \
-						<div class="tt-item-label"><div class="box" style="background-color: '+vars.bar.color+'"></div>'+vars.measureTitle[i-1].qFallbackTitle+':</div> \
+						<div class="tt-item-label"><div class="box" style="background-color: '+ bgColor +'"></div>'+vars.measureTitle[i-1].qFallbackTitle+':</div> \
 						<div class="tt-item-value">'+roundNumber(vars, vars.data2[d.ypos][i].qText)+'</div> \
 					</div> \
 				</div> \
@@ -346,6 +351,7 @@ define([
 				if (vars.bar.grouped && !vars.stacked) {
 					return 0;
 				} else {
+					d.xpos=i; // For the stackbar tooltips
 					if (i==0) {
 						xpos = 0;
 						return 0;
@@ -416,10 +422,8 @@ define([
 				var textWidth = this.getBBox().width;
 				if(d.qNum!=='NaN' && i>=0) {
 					if(i>0 && vars.stacked) {
-						// return d.qText;
-						return roundNumber(d.qText);
+						return roundNumber(vars, d.qText);
 					} else if (i>0 && !vars.stacked) {
-						// return d.qText;
 						return roundNumber(vars, d.qText);
 					}
 				} else {
