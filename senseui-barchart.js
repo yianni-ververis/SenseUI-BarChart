@@ -40,7 +40,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '3.0.4', 
+			v: '3.0.5', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -70,7 +70,7 @@ define([
 				characters: (layout.vars.yaxis.characters) ? layout.vars.yaxis.characters:50,
 				rightPadding: (layout.vars.yaxis.rightPadding) ? layout.vars.yaxis.rightPadding:50,
 				padding: 15,
-				minWidth: 50
+				minWidth: 100
 			},
 			footer: {
 				visible: layout.vars.xaxis.visible,
@@ -172,10 +172,9 @@ define([
 		var calculatedHeight = vars.data2.length * (vars.bar.height + vars.bar.padding);
 		
 		// Adjust the label width based on viewport
-		if (vars.width < vars.css.breakpoint) {
-			// vars.label.width = vars.width*0.6;
-			vars.label.width = vars.label.minWidth;
-		}
+		// if (vars.width < vars.css.breakpoint) {
+		// 	vars.label.width = vars.label.minWidth;
+		// }
 
 		// $element.append($('<div />;').attr("id", vars.id).width(vars.width).height(vars.height).addClass('outer'));
 		$element.append($(vars.template).width(vars.width).height(vars.height));
