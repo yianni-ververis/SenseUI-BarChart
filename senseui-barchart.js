@@ -6,6 +6,7 @@
  * @param {string} title - Initial text for the dropdown
  * @description
  * 
+ * @version 3.0.6: Popup on text
  * @version 3.0.2: Added special symbols
  * @version 3.0.1: Increase speed with d3 v4
  * @version 2.1.3: Limit Results
@@ -40,7 +41,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '3.0.5', 
+			v: '3.0.7', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -260,7 +261,7 @@ define([
 		}
 
 		var	xAxis = d3.axisBottom(x);
-
+		
 		var	yAxis = d3.axisLeft(y)
 			.tickSize(0)
 			.tickFormat(function(d,i){
@@ -487,6 +488,35 @@ define([
 				}
 				return style;
 			})
+			.on("mousemove", function(d,i){
+				d3.select(this).style("cursor", "pointer");
+				d3.select(this).style("fill", vars.bar.colorHover);
+				d3.select(this).style("stroke", vars.bar.borderColorHover);
+				d3.select(this).style("stroke-width", vars.bar.border);
+				if (vars.tooltip.visible) {					
+					if (vars.tooltip.mashup && vars.tooltip.divid && $('#'+vars.tooltip.divid).length>0) {
+						vars.tooltip.scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
+						vars.tooltip.scrollTop = -$('#'+vars.tooltip.divid).offset().top;
+					}
+					tooltip
+					// .style("left", vars.tooltip.scrollLeft + d3.event.pageX - 100 + "px")
+					.style("left", vars.tooltip.scrollLeft + d3.event.pageX - ($('.'+vars.id + '.d3-tip').width() / 2) - 7 + "px")
+					.style("top", vars.tooltip.scrollTop + d3.event.pageY - 70 + "px")
+					.style("display", "inline-block")
+					.html(tooltipHtml(d,i));
+				}
+			})
+			.on("mouseout", function(d,i){ 
+				tooltip.style("display", "none");
+				d3.select(this).style("fill", vars.palette[i-1]);
+				d3.select(this).style("stroke", vars.bar.borderColor);
+			})
+			.on('click', function(d,i) {
+				tooltip.style("display", "none");
+				if (vars.enableSelections) {
+					vars.this.backendApi.selectValues(0, [d.qElemNumber], true);
+				}
+			});
 			
 		// Lollipop
 		if (vars.bar.lollipop){
