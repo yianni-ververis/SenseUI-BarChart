@@ -41,7 +41,7 @@ define([
 
 	me.paint = function($element,layout) {
 		var vars = {
-			v: '3.0.7', 
+			v: '3.0.8', 
 			id: layout.qInfo.qId,
 			data: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
 			data2: layout.qHyperCube.qDataPages[0].qMatrix.filter(d => d[1].qNum > 0),
@@ -490,16 +490,12 @@ define([
 			})
 			.on("mousemove", function(d,i){
 				d3.select(this).style("cursor", "pointer");
-				d3.select(this).style("fill", vars.bar.colorHover);
-				d3.select(this).style("stroke", vars.bar.borderColorHover);
-				d3.select(this).style("stroke-width", vars.bar.border);
 				if (vars.tooltip.visible) {					
 					if (vars.tooltip.mashup && vars.tooltip.divid && $('#'+vars.tooltip.divid).length>0) {
 						vars.tooltip.scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft
 						vars.tooltip.scrollTop = -$('#'+vars.tooltip.divid).offset().top;
 					}
 					tooltip
-					// .style("left", vars.tooltip.scrollLeft + d3.event.pageX - 100 + "px")
 					.style("left", vars.tooltip.scrollLeft + d3.event.pageX - ($('.'+vars.id + '.d3-tip').width() / 2) - 7 + "px")
 					.style("top", vars.tooltip.scrollTop + d3.event.pageY - 70 + "px")
 					.style("display", "inline-block")
@@ -508,8 +504,6 @@ define([
 			})
 			.on("mouseout", function(d,i){ 
 				tooltip.style("display", "none");
-				d3.select(this).style("fill", vars.palette[i-1]);
-				d3.select(this).style("stroke", vars.bar.borderColor);
 			})
 			.on('click', function(d,i) {
 				tooltip.style("display", "none");
